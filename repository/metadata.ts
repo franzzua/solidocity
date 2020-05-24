@@ -1,3 +1,4 @@
+import '../core/orderBy';
 import {Reference, TripleSubject} from "tripledoc";
 
 export type Constructor = any;
