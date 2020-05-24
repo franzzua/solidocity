@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "es6",
+    "sourceMap": true,
+    "outDir": "./dist/esm",
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "./dist/typings",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": ".",
+    "lib": [
+      "ES2015",
+      "ES2019.Array",
+      "DOM"
+    ],
+    "types": [
+      "node",
+      "symbol-observable",
+      "jest"
+    ],
+    "paths": {
+    }
+  },
+  "exclude": [
+    "dist"
+  ]
+}
