@@ -16,6 +16,9 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "bundleDependencies": [
+    "tripledoc"
+  ],
   "peerDependencies": {
     "node-fetch": "^2.6.0",
     "rdf-namespaces": "^1.8.0"
