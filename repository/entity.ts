@@ -15,6 +15,7 @@ import {Reference} from "../contracts";
 import {rdf} from "rdf-namespaces";
 import {EntitySet, FieldEntitySet} from "./entity-set";
 
+/** @internal **/
 class SubjectReader {
     public static Read(subject: TripleSubject, fieldInfos: IFieldInfo[]) {
         const result = {};
