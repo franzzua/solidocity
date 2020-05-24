@@ -1,4 +1,4 @@
-import {Permutation} from "./permutation";
+import {Permutation} from "../core/permutation";
 
 describe('permutation', () => {
     it('should apply', () => {

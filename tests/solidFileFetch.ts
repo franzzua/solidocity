@@ -1,4 +1,3 @@
-import {Response} from 'node-fetch';
 
 import {parse,sparqlUpdateParser, graph} from 'rdflib';
 const N3 = require('n3');

@@ -1,16 +1,13 @@
 import "jest";
-import {AppContainer} from "../container";
-import {AuthAppService} from "@app";
+import {authService} from "../auth-service";
 
-
-const authAppService = AppContainer.get<AuthAppService>(AuthAppService);
 
 it('should login', async () => {
-    const session = await authAppService.Auth();
+    const session = await authService.Auth();
     expect(session.webId).not.toBe(null);
 });
 
 it('should has session', async () => {
-    const session = await authAppService.GetSession();
+    const session = await authService.GetSession();
     expect(session.webId).not.toBe(null);
 });
