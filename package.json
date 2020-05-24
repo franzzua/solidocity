@@ -7,6 +7,7 @@
     "bundle:watch": "hypertype node --watch",
     "bundle:prod": "hypertype node --prod",
     "bundle:prod:stats": "hypertype node --prod --stats",
+    "publish": "npm version patch && npm publish",
     "test": "jest"
   },
   "keywords": [],
@@ -17,6 +18,10 @@
     "node-fetch": "^2.6.0",
     "rdf-namespaces": "^1.8.0"
   },
+  "files": [
+    "dist",
+    "readme.md"
+  ],
   "devDependencies": {
     "@hypertype/tools": "^3.3.17",
     "@types/jest": "^25.2.3",
