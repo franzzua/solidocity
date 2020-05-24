@@ -1,22 +1,14 @@
 import "jest";
-import {AppContainer} from "../../container";
 import {schema} from "rdf-namespaces";
-import {AuthAppService, ISession} from "@app";
 import {Entity} from "../repository";
-import {Profile} from "../repository";
 import {Document} from "../repository";
 import {EntitySet} from "../repository";
 import {ValuesSet} from "../repository";
-import {SolidFileService} from "../contracts";
-import {POD} from "../container";
 import {entity, field, document, entityField} from "../repository";
+import {authService, ISession} from "../auth-service";
 
 const pod = 'https://fransua.inrupt.net';
 
-AppContainer.provide([
-    {provide: POD, useValue: pod},
-]);
-const authService = AppContainer.get<AuthAppService>(AuthAppService);
 let session: ISession;
 let testDoc: TestEntityDocument;
 

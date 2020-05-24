@@ -1,9 +1,7 @@
 import {createDocument, fetchDocument, Reference} from "tripledoc";
-import {Inject} from "@hypertype/core";
 import {Entity, EntityConstructor} from "./entity";
 import {ItemsDocument} from "./document";
 import {SolidFileService} from "../contracts";
-import {POD} from "../container";
 
 export class SolidRepository<TEntity extends Entity> {
 
@@ -12,7 +10,7 @@ export class SolidRepository<TEntity extends Entity> {
     private baseURI: Reference;
 
     constructor(private fc: SolidFileService,
-                @Inject(POD) private pod: string,
+                private pod: string,
                 private type: EntityConstructor<TEntity>,
                 private path: string
     ) {

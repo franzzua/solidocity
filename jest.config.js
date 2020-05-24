@@ -12,6 +12,6 @@ module.exports = {
     preset: "ts-jest",
     moduleNameMapper: {
         ...pathsToModuleNameMapper(compilerOptions.paths, {prefix: '<rootDir>/'}),
-        'solid-auth-client': '<rootDir>/solid/impl/fetch.impl.ts'
+        'solid-auth-client': '<rootDir>/impl/fetch.impl.ts'
     }
 };
