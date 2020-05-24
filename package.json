@@ -1,6 +1,6 @@
 {
   "name": "solidocity",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
   "typings": "dist/typings/index.d.ts",
