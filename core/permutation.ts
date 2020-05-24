@@ -46,6 +46,7 @@ export class Permutation {
         const arr = new Array(to.length);
         for (let i = 0; i < to.length; i++){
             arr[i] = from.indexOf(to[i]);
+            if (arr[i] == -1) arr[i] = i;
         }
         return new Permutation(arr);
     }

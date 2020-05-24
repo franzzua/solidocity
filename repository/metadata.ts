@@ -1,5 +1,6 @@
 import '../core/orderBy';
-import {Reference, TripleSubject} from "tripledoc";
+import {TripleSubject} from "tripledoc";
+import {Reference} from "../contracts";
 
 export type Constructor = any;
 
@@ -25,13 +26,13 @@ export class Metadata {
         ]);
     }
 
-    public static addEntityField(target: { constructor }, key, constructor, isArray) {
+    public static addEntityField(target: { constructor }, key, constructor, info: IFieldInfo) {
         this.Fields.set(target.constructor, [
             ...(this.Fields.get(target.constructor) ?? []),
             {
+                ...info,
                 Constructor: constructor,
                 field: key,
-                isArray,
                 type: "object"
             }
         ]);
@@ -75,7 +76,7 @@ export function merge<T>(from: T[], to: T[], onCreate: (t: T) => void, onUpdate:
         onDelete(to[i]);
     }
 }
-
+/** @internal **/
 export function removeSubjectValue(subject: TripleSubject, info: IFieldInfo, value) {
     switch (info.type) {
         case "string":
@@ -89,6 +90,7 @@ export function removeSubjectValue(subject: TripleSubject, info: IFieldInfo, val
     }
 }
 
+/** @internal **/
 export function addSubjectValue(subject: TripleSubject, info: IFieldInfo, value) {
     switch (info.type) {
         case "string":
@@ -102,6 +104,7 @@ export function addSubjectValue(subject: TripleSubject, info: IFieldInfo, value)
     }
 }
 
+/** @internal **/
 export function setSubjectValue(subject: TripleSubject, info: IFieldInfo, value) {
     switch (info.type) {
         case "string":
@@ -120,6 +123,7 @@ export function setSubjectValue(subject: TripleSubject, info: IFieldInfo, value)
  * @param subject
  * @param info
  */
+/** @internal **/
 export function getSubjectValues(subject: TripleSubject, info: IFieldInfo): (string | Date | Reference | number)[] {
     switch (info.type) {
         case "string":
@@ -134,3 +138,22 @@ export function getSubjectValues(subject: TripleSubject, info: IFieldInfo): (str
 }
 
 
+
+/**
+ * Возвращает одно значениу @param subject
+ * @param subject
+ * @param info
+ */
+/** @internal **/
+export function getSubjectValue(subject: TripleSubject, info: IFieldInfo): (string | Date | Reference | number) {
+    switch (info.type) {
+        case "string":
+            return subject.getString(info.predicate);
+        case "Date":
+            return subject.getDateTime(info.predicate);
+        case "ref":
+            return subject.getRef(info.predicate);
+        case "decimal":
+            return subject.getDecimal(info.predicate);
+    }
+}

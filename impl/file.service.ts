@@ -1,6 +1,6 @@
 import * as SolidFileClient from "solid-file-client";
 import {FetchImpl} from "./fetch.impl";
-import {SolidFileService} from "../contracts";
+import {SolidFileService} from "../contracts/file.service";
 
 
 class SolidFileServiceImpl extends SolidFileClient {

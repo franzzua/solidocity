@@ -1,7 +1,8 @@
-import {createDocument, fetchDocument, Reference} from "tripledoc";
+import {createDocument, fetchDocument} from "tripledoc";
 import {Entity, EntityConstructor} from "./entity";
 import {ItemsDocument} from "./document";
 import {SolidFileService} from "../contracts";
+import {Reference} from "../contracts";
 
 export class SolidRepository<TEntity extends Entity> {
 
@@ -63,15 +64,4 @@ export class SolidRepository<TEntity extends Entity> {
         await this.Init();
     }
 }
-
-export type ConstructorOf<T, Params extends Array<any>> = {
-    new(...args: Params): T;
-}
-
-export class Permission {
-    User: Reference;
-
-}
-
-
 

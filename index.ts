@@ -1,7 +1,6 @@
-import './core/orderBy';
 import {authService} from "./auth-service";
 import {Profile} from "./repository";
-export * from "./contracts";
+import auth from "./impl/fetch.impl";
 export * from "./repository"
 export * from "./auth-service";
 
@@ -10,4 +9,7 @@ export async function getMyName() {
     const profile = new Profile(session.webId);
     await profile.Init();
     return  profile.Me.FullName;
+}
+export {
+    auth
 }

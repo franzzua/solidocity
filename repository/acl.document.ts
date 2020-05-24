@@ -36,6 +36,7 @@ export class AclDocument extends BaseDocument{
     }
 
 
+    /** @internal **/
     protected async CreateDocument(): Promise<TripleDocument> {
         return null;
     }
@@ -52,6 +53,7 @@ export class AclDocument extends BaseDocument{
         this.doc = await doc.save();
     }
 
+    /** @internal **/
     protected async InitRules(doc: BareTripleDocument, owner: Reference, rights: Reference[]){
         const mySubject = doc.addSubject({identifier: `owner`});
         const myAuth = new AclAuthorization(mySubject, this);
@@ -68,7 +70,7 @@ export class AclDocument extends BaseDocument{
         otherAuth.Save();
     }
 
-    @entityField(AclAuthorization, true)
+    @entityField(AclAuthorization, {isArray: true})
     public Rules: EntitySet<AclAuthorization>;
 
 }

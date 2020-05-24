@@ -1,6 +1,6 @@
 import {ItemsDocument} from "./document";
 import {
-    addSubjectValue,
+    addSubjectValue, getSubjectValue,
     getSubjectValues,
     IFieldInfo,
     merge,
@@ -10,42 +10,50 @@ import {
 } from "./metadata";
 import {ValuesSet} from "./values-set";
 import {BaseDocument} from "./base.document";
-import {Reference, TripleSubject} from "tripledoc";
-import type {ConstructorOf} from "./solid.repository";
+import {TripleSubject} from "tripledoc";
+import {Reference} from "../contracts";
 import {rdf} from "rdf-namespaces";
+import {EntitySet, FieldEntitySet} from "./entity-set";
 
-
-export class SubjectReader {
+class SubjectReader {
     public static Read(subject: TripleSubject, fieldInfos: IFieldInfo[]) {
         const result = {};
-        for (const info of fieldInfos) {
-            if (info.isArray && info.isOrdered) {
-                if (!result[info.field])
-                    result[info.field] = new ValuesSet([]);
-                result[info.field].Load(subject, info);
-            } else if (info.isArray){
-                result[info.field] = getSubjectValues(subject, info);
-            } else {
-                result[info.field] = getSubjectValues(subject, info)[0];
-            }
-        }
+
         return result;
     }
 }
 
-export type EntityConstructor<TEntity> = ConstructorOf<TEntity, ConstructorParameters<typeof Entity>> ;
-
 export class Entity {
 
-    constructor(private subject: TripleSubject, document: BaseDocument) {
+    /** @internal **/
+    constructor(protected subject:TripleSubject, document: BaseDocument) {
         this.Document = document;
         this.Load();
     }
 
     protected Load() {
         const fieldInfos = Metadata.Fields.get(this.constructor);
-        const result = SubjectReader.Read(this.subject, fieldInfos);
-        Object.assign(this, result);
+        for (const info of fieldInfos) {
+            if (info.type == "object"){
+                if (info.isArray){
+                    const subjects = this.subject.getAllLocalSubjects(info.predicate);
+                    const set = new FieldEntitySet(this.Document, info.Constructor, this.subject);
+                    set.Load(subjects);
+                    this[info.field] = set;
+                }else{
+                    const subj = this.subject.getLocalSubject(info.predicate);
+                    this[info.field] = new info.Constructor(subj, this.Document);
+                }
+            }else {
+                if (info.isArray && info.isOrdered) {
+                    this[info.field] = new ValuesSet(this.subject, info);
+                } else if (info.isArray) {
+                    this[info.field] = getSubjectValues(this.subject, info);
+                } else {
+                    this[info.field] = getSubjectValue(this.subject, info);
+                }
+            }
+        }
         this.Id = this.subject.asRef();
     }
 
@@ -53,8 +61,8 @@ export class Entity {
         const fieldInfos = Metadata.Fields.get(this.constructor);
         for (const info of fieldInfos) {
             const key = info.field;
-            const values = getSubjectValues(this.subject, info);
             if (info.isArray) {
+                const values = getSubjectValues(this.subject, info);
                 const newItems = this[key];
                 if (!newItems || !newItems.length) {
                     this.subject.removeAll(info.predicate);
@@ -66,13 +74,11 @@ export class Entity {
                     );
                 }
             } else {
-                if (values[0] != this[key]) {
+                const value = getSubjectValue(this.subject, info);
+                if (value != this[key]) {
                     if (this[key] == null)
                         this.subject.removeAll(info.predicate);
-                    else if (!values.length)
-                        addSubjectValue(this.subject, info, this[key]);
-                    else
-                        setSubjectValue(this.subject, info, this[key]);
+                    setSubjectValue(this.subject, info, this[key]);
                 }
             }
         }
@@ -91,3 +97,10 @@ export class Entity {
     Id: Reference;
     Document: BaseDocument;
 }
+
+
+export type ConstructorOf<T, Params extends Array<any>> = {
+    new(...args: Params): T;
+}
+
+export type EntityConstructor<TEntity> = ConstructorOf<TEntity, ConstructorParameters<typeof Entity>> ;

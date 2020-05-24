@@ -1,6 +1,7 @@
 import "jest";
 import {authService, ISession} from "../auth-service";
 import {Profile} from "../repository";
+import { acl } from "rdf-namespaces";
 
 let session: ISession;
 let profile: Profile;
@@ -19,4 +20,20 @@ describe('solid repository', () => {
         expect(profile.Me.FullName).not.toBe(null);
     }, 20000);
 
+
+    it('profile could have trusted apps', async () => {
+        console.log(profile.Me.TrustedApps.Items.map(x => x.Origin));
+    }, 20000);
+
+
+    it('add localhost to trusted apps', async () => {
+        console.log(profile.Me.TrustedApps.Items.map(x => x.Origin));
+        const newApp = await profile.Me.TrustedApps.Add();
+        newApp.Origin = 'http://localhost:3200';
+        newApp.Modes = [acl.Read, acl.Write, acl.Control];
+        newApp.Save();
+        await profile.Save();
+        await profile.Init();
+        console.log(profile.Me.TrustedApps.Items.map(x => x.Origin));
+    }, 20000);
 });

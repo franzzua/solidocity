@@ -1,8 +1,14 @@
 import {Document} from "./document";
-import { foaf, vcard, ldp, schema } from "rdf-namespaces";
+import {foaf, vcard, ldp, schema, acl} from "rdf-namespaces";
 import {Entity} from "./entity";
 import {entity, entityField, field, document} from "./decorators";
-import {Reference} from "tripledoc";
+import {Reference} from "../contracts";
+import {EntitySet} from "./entity-set";
+
+const acl2 = {
+    ...acl,
+    trustedApp: 'http://www.w3.org/ns/auth/acl#trustedApp',
+};
 
 @entity(foaf.PersonalProfileDocument)
 export class Card extends Entity {
@@ -11,6 +17,17 @@ export class Card extends Entity {
 
     @field(foaf.primaryTopic, {type: "ref"})
     public PrimaryTopic: Reference;
+}
+
+
+@entity(acl2.trustedApp)
+export class TrustedApp extends Entity{
+
+    @field(acl.mode, {type: "ref", isArray: true})
+    public Modes: Reference[];
+
+    @field(acl.origin, {type:"ref"})
+    public Origin: Reference;
 }
 
 @entity(schema.Person)
@@ -29,6 +46,7 @@ export class Person extends Entity{
 
 }
 
+
 @document(schema.ProfilePage)
 export class Profile extends Document {
 
@@ -37,4 +55,7 @@ export class Profile extends Document {
 
     @entityField(Person)
     public Me: Person;
+
+    @entityField(TrustedApp, {isArray: true})
+    public TrustedApps: EntitySet<TrustedApp>;
 }

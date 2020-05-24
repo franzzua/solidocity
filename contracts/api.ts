@@ -1,7 +1,4 @@
-import {AGENT, MERGE} from "solid-file-client/src/SolidApi.js"
-import { Reference } from "tripledoc"
-
-// export {MERGE, AGENT} from "solid-file-client";
+export type Reference = string;
 
 export abstract class SolidApi {
     /**
@@ -267,6 +264,18 @@ export abstract class SolidApi {
     public abstract rename(url, newName, moveOptions): Promise<any>;
 }
 
+export enum AGENT {
+    NO_MODIFY= 'no_modify',
+    TO_TARGET= 'to_target',
+    TO_SOURCE= 'to_source'
+}
+
+export enum MERGE {
+    REPLACE= 'replace',
+    KEEP_SOURCE= 'keep_source',
+    KEEP_TARGET= 'keep_target'
+}
+
 export interface IWriteOptions {
     withAcl?: boolean;
     withMeta?: boolean;
@@ -292,6 +301,3 @@ export interface IFolder extends IFile {
     folders: IFile[]
 }
 
-export {
-    Reference
-}

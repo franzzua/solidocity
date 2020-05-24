@@ -1,8 +1,10 @@
 import {Metadata} from "./metadata";
 import {EntitySet} from "./entity-set";
-import {TripleDocument, Reference, fetchDocument} from "tripledoc";
+import {TripleDocument, fetchDocument} from "tripledoc";
+import {Reference} from "../contracts";
 
 export abstract class BaseDocument {
+    /** @internal **/
     public doc: TripleDocument;
 
     constructor(public URI: Reference) {
@@ -34,6 +36,7 @@ export abstract class BaseDocument {
         }
     }
 
+    /** @internal **/
     protected abstract async CreateDocument(): Promise<TripleDocument>;
 
     public async Save() {

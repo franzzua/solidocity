@@ -1,10 +1,10 @@
 import {Constructor, IFieldInfo, Metadata} from "./metadata";
-import {Reference} from "tripledoc";
+import {Reference} from "../contracts";
 
 
-export const entityField: (constructor: Constructor, isArray?) => PropertyDecorator
-    = (constructor, isArray = false) => (target: { constructor }, key: string) => {
-    Metadata.addEntityField(target, key, constructor, isArray);
+export const entityField: (constructor: Constructor, info?: IFieldInfo) => PropertyDecorator
+    = (constructor, info = {}) => (target: { constructor }, key: string) => {
+    Metadata.addEntityField(target, key, constructor, info);
 };
 
 export const document: (reference?: Reference) => ClassDecorator

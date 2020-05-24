@@ -12,4 +12,9 @@ export const FetchImpl = async (url, options) => {
 
 auth.fetch = FetchImpl;
 
-export default auth;
+
+export default auth as {
+    fetch(url, options);
+    login(cfg?);
+    currentSession();
+};

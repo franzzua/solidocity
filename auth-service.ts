@@ -1,4 +1,4 @@
-import * as auth from 'solid-auth-cli';
+import auth from './impl/fetch.impl';
 import {Reference} from "./contracts";
 
 
