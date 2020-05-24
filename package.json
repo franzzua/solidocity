@@ -47,8 +47,5 @@
       "index": "./dist/esm/index.js",
       "type": "node"
     }
-  },
-  "dependencies": {
-    "solidocity": "^1.0.0"
   }
 }
