@@ -1,11 +1,22 @@
 import "jest";
-import {AppContainer} from "../container";
-import {ProfileRepository} from "@infr";
+import {authService, ISession} from "../auth-service";
+import {Profile} from "../repository";
 
-const profileRepository = AppContainer.get<ProfileRepository>(ProfileRepository);
+let session: ISession;
+let profile: Profile;
 
-it('should has profile', async () => {
-    const profile = await profileRepository.GetProfile();
-    console.log(profile);
-    expect(profile?.webId).not.toBe(null);
-}, 20000);
+
+describe('solid repository', () => {
+
+    beforeAll(async () => {
+        session = await authService.GetSession();
+        profile = new Profile(session.webId);
+        await profile.Init();
+    }, 10000);
+
+
+    it('profile should have user', async () => {
+        expect(profile.Me.FullName).not.toBe(null);
+    }, 20000);
+
+});

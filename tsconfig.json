@@ -21,15 +21,6 @@
       "jest"
     ],
     "paths": {
-      "@infr": [
-        "./infr/index.ts"
-      ],
-      "@solid": [
-        "../solidocity/index.ts"
-      ],
-      "@app": [
-        "./app/index.ts"
-      ]
     }
   },
   "exclude": [
