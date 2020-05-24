@@ -27,7 +27,11 @@ class SubjectReader {
 export class Entity {
 
     /** @internal **/
-    constructor(protected subject:TripleSubject, document: BaseDocument) {
+    constructor(
+        /** @internal **/
+        protected subject:TripleSubject,
+        document: BaseDocument
+    ) {
         this.Document = document;
         this.Load();
     }
