@@ -9,7 +9,7 @@
     "bundle:watch": "hypertype node --watch",
     "bundle:prod": "hypertype node --prod",
     "bundle:prod:stats": "hypertype node --prod --stats",
-    "publish": "npm version patch && npm publish",
+    "publish&version": "npm version patch && npm publish",
     "test": "jest"
   },
   "keywords": [],
