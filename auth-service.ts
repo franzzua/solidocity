@@ -1,9 +1,11 @@
 import * as auth from 'solid-auth-cli';
-import {readFileSync} from "fs";
-import {join} from 'path';
-const homedir = require('os').homedir();
+import {Reference} from "./contracts";
+
 
 export class AuthService{
+
+    constructor(private config?: {idp: Reference, username?: string, password?: string} | string) {
+    }
 
     public async GetSession(): Promise<ISession> {
         const session = await auth.currentSession();
@@ -14,9 +16,7 @@ export class AuthService{
 
     public async Auth(): Promise<ISession> {
         try {
-            const authCfg = readFileSync(join(homedir,'solid-auth-cfg.json'), 'utf8');
-            const session = await auth.login(JSON.parse(authCfg));
-            return session;
+            return await auth.login(this.config);
         } catch (e) {
             throw e;
         }

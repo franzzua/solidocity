@@ -21,9 +21,14 @@
       "jest"
     ],
     "paths": {
+      "text-encoding": [
+        "./polyfills/text-encoder.js"
+      ]
     }
   },
   "exclude": [
-    "dist"
+    "dist",
+    "node_modules",
+    "tests"
   ]
 }

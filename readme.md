@@ -16,7 +16,7 @@ await profile.Save();
 
 Define your models:
 
-```javascript
+```typescript
 @document(schema.ProfilePage)
 export class Profile extends Document {
 
@@ -41,6 +41,12 @@ export class Person extends Entity{
 
 * supports multiple values and ordered arrays
 * supports ACL-files for reading and writing permissions
+
+* **AuthService** for authentication
+    * `constructor({idp: Reference, username, password})` with custom user and password
+    * `constructor({idp: Reference})` with custom idp - only for Browser
+    * `constructor(path: string)` - loads config from file - only for NodeJS
+    * `constructor()` - loads config from file `~/.solid-auth-cli-config.json` if in NodeJS
 
 * **Document** base class representing file in POD.
     * `constructor(uri)` - file uri
