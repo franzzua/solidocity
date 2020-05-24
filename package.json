@@ -1,7 +1,9 @@
 {
   "name": "solidocity",
-  "version": "1.0.0",
-  "main": "index.ts",
+  "version": "1.0.1",
+  "main": "dist/index.js",
+  "module": "dist/esm/index.js",
+  "typings": "dist/typings/index.d.ts",
   "scripts": {
     "build": "tsc --watch",
     "bundle:watch": "hypertype node --watch",
@@ -30,8 +32,8 @@
     "mime-types": "^2.1.27",
     "n3": "^1.3.7",
     "node-fetch": "^2.6.0",
-    "rdflib": "^1.2.2",
     "rdf-namespaces": "^1.8.0",
+    "rdflib": "^1.2.2",
     "solid-auth-cli": "^1.0.14",
     "solid-file-client": "^1.0.5",
     "solid-file-fns": "^1.0.0",
@@ -45,5 +47,8 @@
       "index": "./dist/esm/index.js",
       "type": "node"
     }
+  },
+  "dependencies": {
+    "solidocity": "^1.0.0"
   }
 }

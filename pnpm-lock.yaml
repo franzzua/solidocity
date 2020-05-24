@@ -1,3 +1,5 @@
+dependencies:
+  solidocity: 1.0.0_48a759dd321b29b4e5a829c39c5710cc
 devDependencies:
   '@hypertype/tools': 3.3.17
   '@types/jest': 25.2.3
@@ -4221,7 +4223,6 @@ packages:
     resolution:
       integrity: sha512-NhZ4CsKx7cYm2vSrBAr2PvFOe6sWDf0UYLRqA6svUYg7+/TSfVAu49jYC4BvQ4Sms9SZgdqGBgroqfDhJdTyKQ==
   /node-fetch/2.6.0:
-    dev: true
     engines:
       node: 4.x || >=6.0.0
     resolution:
@@ -4733,7 +4734,6 @@ packages:
     resolution:
       integrity: sha512-DV06OnhVfl2zcZJQCt+YvU+hoZVgpyQpNFLeAmghq8RJybUxD3B4LRzlBquYS5k+LLd8/c3g5Gnhkqjw5qRMvg==
   /rdf-namespaces/1.8.0:
-    dev: true
     resolution:
       integrity: sha512-xwAYESS5iqRNbsroUP4LXnl37ATCYWQpWah1BJkflj+DEwZ2Tf7+gJG13AFa6dJAM1dy9CN5i9i9G0vLewwYkQ==
   /rdflib/0.19.1:
@@ -5230,6 +5230,16 @@ packages:
       browserfs: ^1.4.3
     resolution:
       integrity: sha512-uYOgiUstLDXAeyAqIfOeI/0jmQ9S7ZpWpE5+8rKScgt3HXUOcAk+PXMkqx4BUfSMfVO84onsDzbHKWjyxXaMqQ==
+  /solidocity/1.0.0_48a759dd321b29b4e5a829c39c5710cc:
+    dependencies:
+      node-fetch: 2.6.0
+      rdf-namespaces: 1.8.0
+    dev: false
+    peerDependencies:
+      node-fetch: ^2.6.0
+      rdf-namespaces: ^1.8.0
+    resolution:
+      integrity: sha512-FImhbLSVnj6/bPaeoq0HVr4Ijo3X6BzhI34heZnZX3vLfa5oM24MER/oMfuXGd/eP1n2HofGqOpep3m4lHKiWA==
   /source-map-resolve/0.5.3:
     dependencies:
       atob: 2.1.2
@@ -6133,6 +6143,7 @@ specifiers:
   solid-auth-cli: ^1.0.14
   solid-file-client: ^1.0.5
   solid-file-fns: ^1.0.0
+  solidocity: ^1.0.0
   symbol-observable: ^1.2.0
   tripledoc: ^4.3.4
   ts-jest: ^26.0.0
