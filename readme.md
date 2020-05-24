@@ -46,6 +46,7 @@ export class Person extends Entity{
     * `constructor(uri)` - file uri
     * `async Init()` - loads file, on error creates it, on error throws it. All fields of Document will be available after Init.
     * `async Save()` - saves document ot file on POD; on error throws it.
+    * `Acl: AclDocument` - control document permissions. By default, they are inherited from parent folder. 
 
 * **Entity** base class representing all values with same Subject in POD file
    * <s>`constructor(uri)`</s> for internal use only
@@ -61,6 +62,8 @@ export class Person extends Entity{
 
 * **ValuesSet** used for ordered array of items (string | References | Date | number)
 
+* **AclDocument**
+    * `async InitACL(owner: ownerURI, ...modes: Reference[])` creates new .acl file that grants control,read,write to owner and choosed rights to everybody 
 
 ```
 @field(predicate, {
