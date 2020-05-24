@@ -10,6 +10,7 @@ export class NodeAuthAppService extends AuthAppService{
         const session = await auth.currentSession();
         if (!session)
             return await this.Auth();
+
         return session;
     }
 
