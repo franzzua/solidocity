@@ -3,19 +3,24 @@ devDependencies:
   '@types/jest': 25.2.3
   '@types/node': 14.0.5
   jest: 26.0.1
+  jest-diff: 26.0.1
   mime-types: 2.1.27
   n3: 1.3.7
-  node-fetch: 2.6.0
+  pretty-format: 26.0.1
+  rdf-js: 1.0.2
   rdf-namespaces: 1.8.0
   rdflib: 1.2.2
-  solid-auth-cli: 1.0.14
   solid-file-client: 1.0.5
   solid-file-fns: 1.0.0
   symbol-observable: 1.2.0
-  tripledoc: 4.3.4
+  tripledoc: 4.3.4_solid-auth-client@2.4.1
   ts-jest: 26.0.0_jest@26.0.1+typescript@3.9.3
   typescript: 3.9.3
 lockfileVersion: 5.1
+optionalDependencies:
+  node-fetch: 2.6.0
+  solid-auth-cli: 1.0.14
+  solid-auth-client: 2.4.1
 packages:
   /@babel/code-frame/7.8.3:
     dependencies:
@@ -4732,6 +4737,10 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha512-DV06OnhVfl2zcZJQCt+YvU+hoZVgpyQpNFLeAmghq8RJybUxD3B4LRzlBquYS5k+LLd8/c3g5Gnhkqjw5qRMvg==
+  /rdf-js/1.0.2:
+    dev: true
+    resolution:
+      integrity: sha512-xnR7jV0oVViKJTDE1RIOHs+b4gGPbhwV/D8SciN8Ib8Li5bqtXxRsQSYs6NfDsPN7SULTh6eh5AQ7kLXo7qQoA==
   /rdf-namespaces/1.8.0:
     dev: true
     resolution:
@@ -5665,13 +5674,14 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-3n1qG+/5kg+jrbTzwAykB5yRYtQCTqOGKq5U5PE3b0a1/mzo6snDhjGS0zJVJunO0NrT3Dg1MLy5TjWP/UJppg==
-  /tripledoc/4.3.4:
+  /tripledoc/4.3.4_solid-auth-client@2.4.1:
     dependencies:
       '@types/http-link-header': 1.0.1
       '@types/n3': 1.1.6
       '@types/solid-auth-client': 2.4.0
       http-link-header: 1.0.2
       n3: 1.3.7
+      solid-auth-client: 2.4.1
     dev: true
     peerDependencies:
       solid-auth-client: ^2.3.1
@@ -6125,12 +6135,16 @@ specifiers:
   '@types/jest': ^25.2.3
   '@types/node': ^14.0.4
   jest: ^26.0.1
+  jest-diff: ^26.0.1
   mime-types: ^2.1.27
   n3: ^1.3.7
   node-fetch: ^2.6.0
+  pretty-format: ^26.0.1
+  rdf-js: ^1.0.2
   rdf-namespaces: ^1.8.0
   rdflib: ^1.2.2
   solid-auth-cli: ^1.0.14
+  solid-auth-client: '*'
   solid-file-client: ^1.0.5
   solid-file-fns: ^1.0.0
   symbol-observable: ^1.2.0

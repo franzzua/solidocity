@@ -4,7 +4,6 @@ import {Entity, EntityConstructor} from "./entity";
 import {BaseDocument} from "./base.document";
 import {createDocument, TripleDocument} from "tripledoc";
 import {Reference} from "../contracts";
-import {fs} from "../impl/file.service";
 
 export class Document extends BaseDocument {
 
@@ -18,7 +17,7 @@ export class Document extends BaseDocument {
 
     /** @internal **/
     protected async CreateDocument(): Promise<TripleDocument> {
-        await fs.createFolder(this.URI.split('/').slice(0, -1).join('/'));
+        //await fs.createFolder(this.URI.split('/').slice(0, -1).join('/'));
         const doc = await createDocument(this.URI);
         return await doc.save();
     }

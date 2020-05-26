@@ -2,7 +2,7 @@ import {ISession} from "../contracts";
 
 let realFetch;
 
-export const FetchImpl = async (url, options) => {
+export const Fetch = async (url, options) => {
     const result = await realFetch(url, options);
     if (+result.status >= 300){
         throw result;
@@ -19,9 +19,9 @@ export function useAuth(auth):{
     getCredentials();
 } {
     realFetch = auth.fetch;
-    auth.fetch = FetchImpl;
+    auth.fetch = Fetch;
     return auth;
 }
 export default {
-    fetch: FetchImpl
+    fetch: Fetch
 }

@@ -1,5 +1,5 @@
 import * as auth from 'solid-auth-cli';
-import {useAuth} from "../impl/fetch.impl";
+import {useAuth} from "../polyfills/fetch";
 
 const {
     login,
