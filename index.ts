@@ -1,5 +1,5 @@
 import {Profile} from "./repository";
-import {useAuth} from "./polyfills/fetch";
+import {useAuth} from "./impl/fetch";
 import { ISession } from "./contracts";
 export * from "./repository"
 
