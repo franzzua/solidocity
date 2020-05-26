@@ -11,6 +11,7 @@ export abstract class BaseDocument {
 
     }
 
+
     public async Init() {
         const fieldInfos = Metadata.Fields.get(this.constructor) ?? [];
         for (const info of fieldInfos) {
@@ -31,7 +32,7 @@ export abstract class BaseDocument {
             if (info.isArray) {
                 (this[info.field] as EntitySet<any>).Load(subjects ?? []);
             } else {
-                this[info.field] = new info.Constructor(subjects[0] ?? this.doc.addSubject(), this);
+                this[info.field] = new info.Constructor((subjects[0] ?? this.doc.addSubject()).asRef(), this);
             }
         }
     }
@@ -40,6 +41,6 @@ export abstract class BaseDocument {
     protected abstract async CreateDocument(): Promise<TripleDocument>;
 
     public async Save() {
-        await this.doc.save();
+        this.doc = await this.doc.save();
     }
 }

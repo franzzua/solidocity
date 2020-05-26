@@ -2,6 +2,19 @@ export type Reference = string;
 
 export abstract class SolidApi {
     /**
+     * Fetch an item and return content as text,json,or blob as needed
+     * @param {string} url
+     * @param {RequestInit} [request]
+     * @returns {Promise<string|Blob|Response>}
+     */
+    public abstract readFile(url, request): Promise<any>;
+
+    public abstract readHead(url, options?): Promise<string>;
+
+    public abstract deleteFile(url): Promise<any>;
+
+    public abstract deleteFolder(url, options?): Promise<any>;
+    /**
      * Fetch a resource with the passed fetch method
      * @param {string} url
      * @param {RequestInit} [options]

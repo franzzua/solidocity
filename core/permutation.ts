@@ -50,4 +50,8 @@ export class Permutation {
         }
         return new Permutation(arr);
     }
+
+    static FromShort(reordering: number[][]) {
+        return undefined;
+    }
 }

@@ -14,15 +14,18 @@ export class EntitySet<TEntity extends Entity> {
         return [...this.items.values()];
     }
 
-    public async Add(id = undefined) {
-        const subject = this.document.doc.addSubject({ identifier: id});
-        const newItem = new this.itemConstructor(subject, this.document);
+
+    public Add(id = undefined) {
+        const subject = this.document.doc.addSubject({
+            identifier: id?.split('#').pop()
+        });
+        const newItem = new this.itemConstructor(subject.asRef(), this.document);
         this.items.set(newItem.Id, newItem);
         return newItem;
     }
     /** @internal */
     Load(subjects: TripleSubject[]) {
-        this.items = new Map(subjects.map(x => new this.itemConstructor(x, this.document))
+        this.items = new Map(subjects.map(x => new this.itemConstructor(x.asRef(), this.document))
             .map(x => [x.Id, x]));
     }
 
@@ -50,8 +53,8 @@ export class FieldEntitySet<TEntity extends Entity> extends EntitySet<TEntity>{
     }
 
 
-    public async Add(id = undefined){
-        const result = await super.Add(id);
+    public Add(id = undefined){
+        const result = super.Add(id);
         const info = Metadata.Entities.get(this.itemConstructor);
         this.subj.addRef(info.TypeReference, result.Id);
         return  result;

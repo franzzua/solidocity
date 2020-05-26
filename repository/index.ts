@@ -1,4 +1,3 @@
-export * from "./solid.repository";
 export * from './decorators';
 export * from './values-set';
 export * from './entity';

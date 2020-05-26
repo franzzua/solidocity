@@ -44,6 +44,8 @@ export class Person extends Entity{
     @field(ldp.inbox, {type: "ref"})
     public Inbox: Reference;
 
+    @entityField(TrustedApp, {isArray: true})
+    public TrustedApps: EntitySet<TrustedApp>;
 }
 
 

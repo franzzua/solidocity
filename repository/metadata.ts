@@ -1,6 +1,7 @@
 import '../core/orderBy';
 import {TripleSubject} from "tripledoc";
 import {Reference} from "../contracts";
+import store from "rdflib/lib/store";
 
 export type Constructor = any;
 
@@ -22,6 +23,7 @@ export class Metadata {
                 ...info,
                 field: key,
                 predicate,
+                equal: info.type == "Date" ? (x,y) => +x == +y : (x,y) => x == y
             }
         ]);
     }
@@ -52,6 +54,7 @@ export interface IFieldInfo {
     isArray?: boolean;
     isOrdered?: boolean;
     type?: 'string' | 'Date' | 'ref' | 'decimal' | 'object';
+    equal?(value: string | Date | number, param2: string | Date | number): boolean;
 }
 
 export interface IDocumentInfo {

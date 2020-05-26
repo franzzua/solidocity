@@ -1,6 +1,6 @@
 import * as SolidFileClient from "solid-file-client";
 import {FetchImpl} from "./fetch.impl";
-import {SolidFileService} from "../contracts/file.service";
+import {SolidApi} from "../contracts";
 
 
 class SolidFileServiceImpl extends SolidFileClient {
@@ -11,4 +11,4 @@ class SolidFileServiceImpl extends SolidFileClient {
 
 }
 
-export const fs = new SolidFileServiceImpl() as SolidFileService
+export const fs = new SolidFileServiceImpl() as SolidApi

@@ -5,7 +5,8 @@ import {Document} from "../repository";
 import {EntitySet} from "../repository";
 import {ValuesSet} from "../repository";
 import {entity, field, document, entityField} from "../repository";
-import {authService, ISession} from "../auth-service";
+import {currentSession, login} from "./auth";
+import {ISession} from "../contracts";
 
 const pod = 'https://fransua.inrupt.net';
 
@@ -15,7 +16,7 @@ let testDoc: TestEntityDocument;
 @entity(`${pod}/types#test`)
 class TestEntity extends Entity {
     @field(schema.Text)
-    public readonly Content: string;
+    public Content: string;
     @field(schema.children, {isArray: true, type: "decimal", isOrdered: true})
     public readonly Children?: ValuesSet<number>;
 
@@ -23,15 +24,15 @@ class TestEntity extends Entity {
 
 @document()
 class TestEntityDocument extends Document {
-    @entityField(TestEntity, true)
+    @entityField(TestEntity, {isArray: true})
     public readonly Entities: EntitySet<TestEntity>;
 }
 
 describe('solid repository', () => {
 
     beforeAll(async () => {
-        session = await authService.GetSession();
-        testDoc = new TestEntityDocument(`${pod}/tmp`);
+        session = await currentSession() ?? await login();
+        testDoc = new TestEntityDocument(`${pod}/tmp/test.ttl`);
         await testDoc.Init();
     }, 10000);
 
@@ -43,5 +44,12 @@ describe('solid repository', () => {
         entity.Children.Push(1, 2, 3);
         entity.Children.Reorder(2,1);
         entity.Save();
+        await entity.Document.Save()
+        entity.Content = 'adasd';
+        entity.Save();
+        await entity.Document.Save()
+        entity.Content = '1231231';
+        entity.Save();
+        await entity.Document.Save()
     }, 20000);
 });

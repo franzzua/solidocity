@@ -25,81 +25,100 @@ class SubjectReader {
 }
 
 export class Entity {
+    public Deleted: boolean;
 
-    /** @internal **/
     constructor(
+        public Id: Reference,
+        document: BaseDocument,
         /** @internal **/
-        protected subject:TripleSubject,
-        document: BaseDocument
+        private localSubject?: TripleSubject
     ) {
         this.Document = document;
         this.Load();
     }
 
-    protected Load() {
+    /** @internal **/
+    public get Subject () {
+       return this.localSubject ?? this.Document.doc.getSubject(this.Id);
+    }
+
+    public Load() {
         const fieldInfos = Metadata.Fields.get(this.constructor);
         for (const info of fieldInfos) {
+
             if (info.type == "object"){
                 if (info.isArray){
-                    const subjects = this.subject.getAllLocalSubjects(info.predicate);
-                    const set = new FieldEntitySet(this.Document, info.Constructor, this.subject);
+                    const subjects = this.Subject.getAllLocalSubjects(info.predicate);
+                    const set = new FieldEntitySet(this.Document, info.Constructor, this.Subject);
                     set.Load(subjects);
                     this[info.field] = set;
                 }else{
-                    const subj = this.subject.getLocalSubject(info.predicate);
+                    const subj = this.Subject.getLocalSubject(info.predicate);
                     this[info.field] = new info.Constructor(subj, this.Document);
                 }
             }else {
                 if (info.isArray && info.isOrdered) {
-                    this[info.field] = new ValuesSet(this.subject, info);
+                    this[info.field] = new ValuesSet(this.Document, this.Id, info);
                 } else if (info.isArray) {
-                    this[info.field] = getSubjectValues(this.subject, info);
+                    this[info.field] = getSubjectValues(this.Subject, info);
                 } else {
-                    this[info.field] = getSubjectValue(this.subject, info);
+                    this[info.field] = getSubjectValue(this.Subject, info);
                 }
             }
         }
-        this.Id = this.subject.asRef();
     }
 
     public Save() {
         const fieldInfos = Metadata.Fields.get(this.constructor);
+        if (this.Deleted){
+            for (const info of fieldInfos) {
+                if (info.isArray && info.isOrdered) {
+                    (this[info.field] as ValuesSet<any>).Delete()
+                }
+                this.Subject.removeAll(info.predicate);
+            }
+            this.Subject.removeAll(rdf.type);
+            this.Document.doc.removeSubject(this.Id);
+            return;
+        }
         for (const info of fieldInfos) {
             const key = info.field;
-            if (info.isArray) {
-                const values = getSubjectValues(this.subject, info);
+            if (info.isArray && info.isOrdered) {
+            } else if (info.isArray) {
+                const values = getSubjectValues(this.Subject, info);
                 const newItems = this[key];
                 if (!newItems || !newItems.length) {
-                    this.subject.removeAll(info.predicate);
+                    this.Subject.removeAll(info.predicate);
                 } else {
                     merge(newItems.orderBy(x => x), values,
-                        newValue => addSubjectValue(this.subject, info, newValue),
-                        updValue => setSubjectValue(this.subject, info, updValue),
-                        newValue => removeSubjectValue(this.subject, info, newValue),
+                        newValue => addSubjectValue(this.Subject, info, newValue),
+                        updValue => setSubjectValue(this.Subject, info, updValue),
+                        newValue => removeSubjectValue(this.Subject, info, newValue),
                     );
                 }
             } else {
-                const value = getSubjectValue(this.subject, info);
-                if (value != this[key]) {
-                    if (this[key] == null)
-                        this.subject.removeAll(info.predicate);
-                    setSubjectValue(this.subject, info, this[key]);
+                const value = getSubjectValue(this.Subject, info);
+                if (!info.equal(value, this[key])){
+                    setSubjectValue(this.Subject, info, this[key]);
                 }
             }
         }
         const currentType = Metadata.Entities.get(this.constructor).TypeReference;
-        this.subject.setRef(rdf.type, currentType);
+        this.Subject.setRef(rdf.type, currentType);
     }
 
     public Assign(data: Omit<this, keyof Entity>) {
 
     }
 
-    public async Remove() {
-        await this.Document.Save();
+    public Remove() {
+        this.Deleted = true;
+        this.Save();
+        //const fieldInfos = Metadata.Fields.get(this.constructor);
+        //for (const info of fieldInfos) {
+        //}
     }
 
-    Id: Reference;
     Document: BaseDocument;
 }
 

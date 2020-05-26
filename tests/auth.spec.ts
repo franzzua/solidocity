@@ -1,13 +1,14 @@
 import "jest";
-import {authService} from "../auth-service";
+import {currentSession,  login} from "./auth";
+import {ISession} from "../contracts";
 
 
 it('should login', async () => {
-    const session = await authService.Auth();
+    const session = await currentSession() ?? await login();
     expect(session.webId).not.toBe(null);
 });
 
 it('should has session', async () => {
-    const session = await authService.GetSession();
+    const session = await currentSession() ;
     expect(session.webId).not.toBe(null);
 });

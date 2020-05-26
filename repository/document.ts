@@ -49,7 +49,7 @@ export class ItemsDocument<TEntity extends Entity> extends Document {
 
     public async Create(item: Omit<TEntity, keyof Entity>): Promise<TEntity> {
         const subject = this.doc.addSubject();
-        const newItem = new this.type(subject, this) as TEntity;
+        const newItem = new this.type(subject.asRef(), this) as TEntity;
         Object.assign(newItem, item);
         newItem.Save();
         await this.doc.save();

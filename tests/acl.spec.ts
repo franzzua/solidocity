@@ -1,6 +1,8 @@
+import "jest";
 import {document, field, entityField, AclDocument, Document, Person} from "../index";
-import {ISession, authService} from "../auth-service";
 import {acl} from "rdf-namespaces";
+import {currentSession, login} from "./auth";
+import {ISession} from "../contracts";
 
 @document()
 export class TestDocument extends Document{
@@ -13,8 +15,8 @@ describe('acl', () => {
     let doc: TestDocument;
     let session: ISession;
     beforeAll(async ()=>{
-        session = await authService.GetSession();
-        doc = new TestDocument('https://fransua.inrupt.net/private/test8.ttl');
+        session = await currentSession() ?? await login();
+        doc = new TestDocument('https://fransua.inrupt.net/tmp/test8.ttl');
         await doc.Init();
     },10000);
 

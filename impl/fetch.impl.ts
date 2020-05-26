@@ -1,6 +1,6 @@
-import * as auth from 'solid-auth-cli'
+import {ISession} from "../contracts";
 
-const realFetch = auth.fetch;
+let realFetch;
 
 export const FetchImpl = async (url, options) => {
     const result = await realFetch(url, options);
@@ -10,11 +10,18 @@ export const FetchImpl = async (url, options) => {
     return result;
 };
 
-auth.fetch = FetchImpl;
-
-
-export default auth as {
-    fetch(url, options);
-    login(cfg?);
-    currentSession();
-};
+export function useAuth(auth):{
+    fetch(req, options): Promise<any>;
+    login(config?: {idp: string, username?: string, password?: string} | string): Promise<ISession>;
+    popupLogin(): Promise<ISession>;
+    currentSession(): Promise<ISession | null>;
+    logout();
+    getCredentials();
+} {
+    realFetch = auth.fetch;
+    auth.fetch = FetchImpl;
+    return auth;
+}
+export default {
+    fetch: FetchImpl
+}

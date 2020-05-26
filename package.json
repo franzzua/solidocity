@@ -16,8 +16,12 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "optionalDependencies": {
+    "node-fetch": "*",
+    "solid-auth-cli": "*",
+    "solid-auth-client": "*"
+  },
   "peerDependencies": {
-    "node-fetch": "^2.6.0",
     "rdf-namespaces": "^1.8.0"
   },
   "files": [

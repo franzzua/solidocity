@@ -1,12 +1,10 @@
 import {entity, document, entityField, field} from "./decorators";
 import {acl, foaf} from "rdf-namespaces";
-import {Document} from "./document";
 import {BaseDocument} from "./base.document";
-import {createDocument, TripleDocument} from "tripledoc";
+import {createDocument, TripleDocument, TripleSubject} from "tripledoc";
 import {EntitySet} from "./entity-set";
 import {Entity} from "./entity";
 import {Reference} from "../contracts";
-import {isArray} from "util";
 import {BareTripleDocument} from "tripledoc";
 
 @entity(acl.Authorization)
@@ -48,26 +46,28 @@ export class AclDocument extends BaseDocument{
     }
 
     async InitACL(owner: Reference, ...rights: Reference[]) {
-        const doc = createDocument(this.URI);
-        await this.InitRules(doc, owner, rights);
-        this.doc = await doc.save();
+        this.doc = createDocument(this.URI) as TripleDocument;
+        await this.InitRules(this.doc, owner, rights);
+        this.doc = await this.doc.save();
+        await this.Init();
     }
 
     /** @internal **/
     protected async InitRules(doc: BareTripleDocument, owner: Reference, rights: Reference[]){
         const mySubject = doc.addSubject({identifier: `owner`});
-        const myAuth = new AclAuthorization(mySubject, this);
+        const myAuth = new AclAuthorization(mySubject.asRef(), this, mySubject);
         myAuth.AccessTo = this.owner.URI;
         myAuth.Agents = [            owner        ]
         myAuth.Modes = [acl.Read, acl.Write, acl.Control];
         myAuth.Save();
         const otherSubject = doc.addSubject({identifier: `other`});
-        const otherAuth = new AclAuthorization(otherSubject, this);
+        const otherAuth = new AclAuthorization(otherSubject.asRef(), this, otherSubject);
         otherAuth.AccessTo = this.owner.URI;
         otherAuth.Default = this.owner.URI;
         otherAuth.AgentClass = foaf.Agent;
         otherAuth.Modes = rights;
         otherAuth.Save();
+
     }
 
     @entityField(AclAuthorization, {isArray: true})
