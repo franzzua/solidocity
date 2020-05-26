@@ -27,6 +27,7 @@ class SubjectReader {
 export class Entity {
     public Deleted: boolean;
 
+    /** @internal **/
     constructor(
         public Id: Reference,
         document: BaseDocument,
