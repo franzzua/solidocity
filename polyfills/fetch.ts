@@ -12,7 +12,9 @@ export const Fetch = async (url, options) => {
 
 export function useAuth(auth):{
     fetch(req, options): Promise<any>;
-    login(config?: {idp: string, username?: string, password?: string} | string): Promise<ISession>;
+    login(config?: {idp: string, username?: string, password?: string} | string, registerConfig?: {
+        clientName?, logoUri?, contacts?
+    }): Promise<ISession>;
     popupLogin(): Promise<ISession>;
     currentSession(): Promise<ISession | null>;
     logout();

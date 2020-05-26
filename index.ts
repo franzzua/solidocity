@@ -1,5 +1,6 @@
 import {Profile} from "./repository";
 import {useAuth} from "./polyfills/fetch";
+import { ISession } from "./contracts";
 export * from "./repository"
 
 export async function getMyName(auth) {
@@ -10,5 +11,5 @@ export async function getMyName(auth) {
     return  profile.Me.FullName;
 }
 export {
-    useAuth
+    useAuth, ISession
 }
