@@ -10,5 +10,9 @@ module.exports = {
             'solid-auth-cli$': `${__dirname}/dist/esm/impl/fetch.js`,
             'node-fetch$': `${__dirname}/dist/esm/impl/fetch.js`,
         }
+    },
+    node: {
+        global: true,
+        stream: true
     }
 }

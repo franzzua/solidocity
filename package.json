@@ -54,7 +54,10 @@
   "hypertype": {
     "node": {
       "index": "./dist/esm/index.js",
-      "type": "node"
+      "type": "web"
     }
+  },
+  "dependencies": {
+    "node-libs-browser": "^2.2.1"
   }
 }
