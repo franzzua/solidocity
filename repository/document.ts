@@ -4,13 +4,14 @@ import {Entity, EntityConstructor} from "./entity";
 import {BaseDocument} from "./base.document";
 import {createDocument, TripleDocument} from "tripledoc";
 import {Reference} from "../contracts";
+import {Fetch} from "../impl/fetch";
 
 export class Document extends BaseDocument {
 
     public async Init(...types: Constructor[]) {
         await super.Init();
         this.Acl = new AclDocument(this.doc.getAclRef(), this);
-        await this.Acl.Init();
+        // await this.Acl.Init();
     }
 
     public Acl: AclDocument;
@@ -21,6 +22,8 @@ export class Document extends BaseDocument {
         const doc = await createDocument(this.URI);
         return await doc.save();
     }
+
+
 
 }
 

@@ -1,8 +1,9 @@
-import {addSubjectValue, getSubjectValues, IFieldInfo, removeSubjectValue} from "./metadata";
+import {IFieldInfo} from "./metadata";
 import {Permutation} from "../core/permutation";
 import {TripleSubject} from "tripledoc";
 import {Reference} from "../contracts";
 import { BaseDocument } from "./base.document";
+import {addSubjectValue, getSubjectValues, removeSubjectValue} from "./subject.ext";
 
 export class ValuesSet<T extends string | Date | number> {
 

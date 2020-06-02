@@ -1,6 +1,6 @@
 
 
-export interface ISession {
+export class ISession {
     issuer: any;
     webId: any;
     credentialType: any;

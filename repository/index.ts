@@ -4,5 +4,7 @@ export * from './entity';
 export * from './entity-set';
 export * from "./acl.document";
 export * from "./document";
+export * from "./collection";
+export * from "./document-set";
 export * from "./base.document";
 export * from './profile';

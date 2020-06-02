@@ -1,5 +1,5 @@
 import "jest";
-import {document, field, entityField, AclDocument, Document, Person} from "../index";
+import {document, field, entitySet, AclDocument, Document, Person} from "../index";
 import {acl} from "rdf-namespaces";
 import {currentSession, login} from "./auth";
 import {ISession} from "../contracts";
@@ -7,7 +7,7 @@ import {ISession} from "../contracts";
 @document()
 export class TestDocument extends Document{
 
-    @entityField(Person)
+    @entitySet(Person)
     public TestEntity: Person;
 }
 

@@ -1,7 +1,7 @@
 import {Document} from "./document";
 import {foaf, vcard, ldp, schema, acl} from "rdf-namespaces";
 import {Entity} from "./entity";
-import {entity, entityField, field, document} from "./decorators";
+import {entity, entitySet, field, document} from "./decorators";
 import {Reference} from "../contracts";
 import {EntitySet} from "./entity-set";
 
@@ -44,7 +44,7 @@ export class Person extends Entity{
     @field(ldp.inbox, {type: "ref"})
     public Inbox: Reference;
 
-    @entityField(TrustedApp, {isArray: true})
+    @entitySet(TrustedApp, {isArray: true})
     public TrustedApps: EntitySet<TrustedApp>;
 }
 
@@ -52,12 +52,12 @@ export class Person extends Entity{
 @document(schema.ProfilePage)
 export class Profile extends Document {
 
-    @entityField(Card)
+    @entitySet(Card)
     public Card: Card;
 
-    @entityField(Person)
+    @entitySet(Person)
     public Me: Person;
 
-    @entityField(TrustedApp, {isArray: true})
+    @entitySet(TrustedApp, {isArray: true})
     public TrustedApps: EntitySet<TrustedApp>;
 }

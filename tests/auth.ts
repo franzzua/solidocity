@@ -18,3 +18,5 @@ export {
     popupLogin,
     currentSession
 }
+
+export const POD = 'https://fransua.inrupt.net';

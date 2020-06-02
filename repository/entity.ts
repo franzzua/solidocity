@@ -1,12 +1,7 @@
 import {ItemsDocument} from "./document";
 import {
-    addSubjectValue, getSubjectValue,
-    getSubjectValues,
     IFieldInfo,
-    merge,
-    Metadata,
-    removeSubjectValue,
-    setSubjectValue
+    Metadata
 } from "./metadata";
 import {ValuesSet} from "./values-set";
 import {BaseDocument} from "./base.document";
@@ -14,6 +9,14 @@ import {TripleSubject} from "tripledoc";
 import {Reference} from "../contracts";
 import {rdf} from "rdf-namespaces";
 import {EntitySet, FieldEntitySet} from "./entity-set";
+import {
+    addSubjectValue,
+    getSubjectValue,
+    getSubjectValues,
+    merge,
+    removeSubjectValue,
+    setSubjectValue
+} from "./subject.ext";
 
 /** @internal **/
 class SubjectReader {

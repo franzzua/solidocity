@@ -1,4 +1,4 @@
-import {entity, document, entityField, field} from "./decorators";
+import {entity, document, entitySet, field} from "./decorators";
 import {acl, foaf} from "rdf-namespaces";
 import {BaseDocument} from "./base.document";
 import {createDocument, TripleDocument, TripleSubject} from "tripledoc";
@@ -70,7 +70,7 @@ export class AclDocument extends BaseDocument{
 
     }
 
-    @entityField(AclAuthorization, {isArray: true})
+    @entitySet(AclAuthorization, {isArray: true})
     public Rules: EntitySet<AclAuthorization>;
 
 }

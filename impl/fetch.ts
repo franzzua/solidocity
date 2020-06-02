@@ -2,7 +2,7 @@ import {ISession} from "../contracts";
 
 let realFetch;
 
-export const Fetch = async (url, options) => {
+export const Fetch: typeof window.fetch = async (url, options) => {
     const result = await realFetch(url, options);
     if (+result.status >= 300){
         throw result;
