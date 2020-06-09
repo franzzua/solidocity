@@ -1,17 +1,17 @@
 import "jest";
 import {Profile} from "../repository";
 import { acl } from "rdf-namespaces";
-import {currentSession, login} from "./auth";
+import {getSession} from "./auth";
 import {ISession} from "../contracts";
 
 let session: ISession;
 let profile: Profile;
 
 
-describe('solid repository', () => {
+describe('solid profile', () => {
 
     beforeAll(async () => {
-        session = await currentSession() ?? await login();
+        session = await getSession();
         profile = new Profile(session.webId);
         await profile.Init();
     }, 10000);

@@ -88,6 +88,7 @@ export class Entity {
         for (const info of fieldInfos) {
             const key = info.field;
             if (info.isArray && info.isOrdered) {
+                (this[info.field] as ValuesSet<any>).Save();
             } else if (info.isArray) {
                 const values = getSubjectValues(this.Subject, info);
                 const newItems = this[key];

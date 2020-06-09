@@ -1,11 +1,11 @@
 import {TestEntityCollection, TestEntityDocument} from "./test.entity";
-import {currentSession, login, POD} from "./auth";
+import { getSession, POD} from "./auth";
 
 describe('collection', ()=>{
-    const collection = new TestEntityCollection(`${POD}/private/r1`);
+    const collection = new TestEntityCollection(`${POD}/private/r2`);
 
     beforeAll(async ()=> {
-        const session = await currentSession() ?? await login();
+        const session = await getSession();
         await collection.Init();
     }, 10000);
 

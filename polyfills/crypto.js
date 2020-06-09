@@ -1,1 +1,4 @@
- module.exports= globalThis.crypto;
+if (!global.crypto){
+    global.crypto = require('crypto');
+}
+module.exports= global.crypto;

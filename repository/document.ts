@@ -4,7 +4,6 @@ import {Entity, EntityConstructor} from "./entity";
 import {BaseDocument} from "./base.document";
 import {createDocument, TripleDocument} from "tripledoc";
 import {Reference} from "../contracts";
-import {Fetch} from "../impl/fetch";
 
 export class Document extends BaseDocument {
 

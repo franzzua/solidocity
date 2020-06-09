@@ -1,29 +1,12 @@
-import {ISession} from "../contracts";
+const Fetch: typeof window.fetch & { fetch?: typeof window.fetch, default: typeof window.fetch }
+    = async (url, options) => {
+        const result = await Fetch.fetch(url, options);
+        if (+result.status >= 300) {
+            throw result;
+        }
+        return result;
+    };
 
-let realFetch;
-
-export const Fetch: typeof window.fetch = async (url, options) => {
-    const result = await realFetch(url, options);
-    if (+result.status >= 300){
-        throw result;
-    }
-    return result;
-};
-
-export function useAuth(auth):{
-    fetch(req, options): Promise<any>;
-    login(config?: {idp: string, username?: string, password?: string} | string, registerConfig?: {
-        clientName?, logoUri?, contacts?
-    }): Promise<ISession>;
-    popupLogin(): Promise<ISession>;
-    currentSession(): Promise<ISession | null>;
-    logout();
-    getCredentials();
-} {
-    realFetch = auth.fetch;
-    auth.fetch = Fetch;
-    return auth;
-}
-export default {
-    fetch: Fetch
-}
+Fetch.default = Fetch;
+global.fetch = Fetch;
+module.exports = Fetch;

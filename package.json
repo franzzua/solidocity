@@ -6,6 +6,8 @@
   "typings": "dist/typings/index.d.ts",
   "scripts": {
     "build": "tsc --watch",
+    "web:watch": "hypertype web --watch",
+    "worker:watch": "hypertype worker --watch",
     "bundle:watch": "hypertype node --watch",
     "bundle:prod": "hypertype node --prod",
     "bundle:prod:stats": "hypertype node --prod --stats",
@@ -31,6 +33,7 @@
   ],
   "devDependencies": {
     "@hypertype/tools": "^3.3.17",
+    "@interop-alliance/oidc-rp": "^0.11.1",
     "@types/jest": "^25.2.3",
     "@types/node": "^14.0.4",
     "@types/pretty-format": "^24.3.0",
@@ -52,12 +55,22 @@
     "typescript": "^3.9.3"
   },
   "hypertype": {
+    "worker": {
+      "index": "./dist/esm/index.js",
+      "type": "worker"
+    },
     "node": {
+      "index": "./dist/esm/index.js",
+      "type": "node"
+    },
+    "web": {
       "index": "./dist/esm/index.js",
       "type": "web"
     }
   },
   "dependencies": {
-    "node-libs-browser": "^2.2.1"
+    "node-libs-browser": "^2.2.1",
+    "solid-auth-oidc": "^0.2.0",
+    "websocket": "^1.0.31"
   }
 }

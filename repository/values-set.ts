@@ -8,6 +8,7 @@ import {addSubjectValue, getSubjectValues, removeSubjectValue} from "./subject.e
 export class ValuesSet<T extends string | Date | number> {
 
     private values: T[];
+    private IsRemoved: boolean;
 
     constructor(private document: BaseDocument, private Id: Reference, private info: IFieldInfo){
         this.Load();
@@ -20,17 +21,22 @@ export class ValuesSet<T extends string | Date | number> {
         if (ordering != null){
             this.permutation = Permutation.Parse(ordering);
         }
+        this.Items = this.permutation.Invoke(this.values);;
     }
 
     //private values = getSubjectValues(this.subject, this.info);
     private permutation: Permutation = Permutation.Empty;// = this.subject.getString(`${this.info.predicate}-order`);
 
-    public get Items(): ReadonlyArray<T>{
-        return this.permutation.Invoke(this.values);
-    }
-    public set Items(items: ReadonlyArray<T>){
-        const added = items.filter(x => !this.values.includes(x));
-        const deleted = this.values.filter(x => !items.includes(x));
+    public Items: ReadonlyArray<T>;
+
+    public Save(){
+        if (this.IsRemoved){
+            const subject = this.document.doc.getSubject(this.Id);
+            subject.removeAll(`${this.info.predicate}-order`);
+            return;
+        }
+        const added = this.Items.filter(x => !this.values.includes(x));
+        const deleted = this.values.filter(x => !this.Items.includes(x));
         for (let x of deleted){
             this.values.splice(this.values.indexOf(x), 1);
         }
@@ -38,12 +44,7 @@ export class ValuesSet<T extends string | Date | number> {
             this.values.push(x);
         }
         this.values.sort();
-        this.permutation = Permutation.Diff(this.values, items);
-        this.Save(deleted, added);
-
-    }
-
-    public Save(deleted, added){
+        this.permutation = Permutation.Diff(this.values, this.Items);
         const subject = this.document.doc.getSubject(this.Id);
         subject.removeAll(`${this.info.predicate}-order`);
         subject.setString(`${this.info.predicate}-order`, this.permutation.toString());
@@ -84,7 +85,6 @@ export class ValuesSet<T extends string | Date | number> {
 
     /** @internal **/
     Delete() {
-        const subject = this.document.doc.getSubject(this.Id);
-        subject.removeAll(`${this.info.predicate}-order`);
+        this.IsRemoved = true;
     }
 }

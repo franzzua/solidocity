@@ -15,6 +15,7 @@ export class EntitySet<TEntity extends Entity> {
     }
 
 
+
     public Add(id = undefined) {
         const subject = this.document.doc.addSubject({
             identifier: id?.split('#').pop()
@@ -23,10 +24,16 @@ export class EntitySet<TEntity extends Entity> {
         this.items.set(newItem.Id, newItem);
         return newItem;
     }
+
     /** @internal */
     Load(subjects: TripleSubject[]) {
+        //console.log('load subjects', subjects.length);
         this.items = new Map(subjects.map(x => new this.itemConstructor(x.asRef(), this.document))
             .map(x => [x.Id, x]));
+    }
+
+    public Save(){
+
     }
 
     public get(id: Reference): TEntity{

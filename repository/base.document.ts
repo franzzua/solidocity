@@ -1,8 +1,9 @@
 import {IFieldInfo, Metadata} from "./metadata";
 import {EntitySet} from "./entity-set";
 import {fetchDocument, TripleDocument} from "tripledoc";
-import {Fetch} from "../impl/fetch";
 import {Reference} from "../contracts";
+import {WebSocket} from "websocket-polyfill";
+const  Fetch = require("../impl/fetch");
 
 export abstract class BaseDocument {
     /** @internal **/
@@ -20,7 +21,7 @@ export abstract class BaseDocument {
             }
         }
         await this.Reload();
-        console.log(`subscribe ${this.URI}`);
+        //console.log(`subscribe ${this.URI}`);
         this.Subscribe(this.URI);
     }
 
@@ -79,7 +80,7 @@ export abstract class BaseDocument {
             resolve();
         }));
         this.isSaving = false;
-        await this.Reload();
+        //await this.Reload();
     }
 
 

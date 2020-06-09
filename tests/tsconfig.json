@@ -6,6 +6,6 @@
     "baseUrl": ".."
   },
   "include": [
-    "tests/**/*.spec.ts"
+    "**/*.spec.ts"
   ]
 }

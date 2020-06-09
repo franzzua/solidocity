@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "CommonJS",
-    "target": "es6",
+    "target": "ES2017",
     "sourceMap": true,
     "outDir": "./dist/esm",
     "declaration": true,
@@ -23,8 +23,11 @@
       "jest"
     ],
     "paths": {
-      "text-encoding": [
-        "./polyfills/text-encoder.js"
+      "solid-auth-client-real/*": [
+        "node_modules/solid-auth-client/*"
+      ],
+      "websocket-polyfill": [
+        "./polyfills/websocket.js"
       ]
     }
   },

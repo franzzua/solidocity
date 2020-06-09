@@ -1,3 +1,1 @@
-module.exports = {
-    TextEncoder, TextDecoder
-}
+module.exports = require('util');

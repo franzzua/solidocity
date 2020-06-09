@@ -1,6 +1,6 @@
 import * as SolidFileClient from "solid-file-client";
 import {SolidApi} from "../contracts";
-import {Fetch} from "./fetch";
+const  Fetch = require("node-fetch");
 
 
 class SolidFileServiceImpl extends SolidFileClient {

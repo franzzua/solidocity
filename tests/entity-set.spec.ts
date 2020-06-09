@@ -1,5 +1,5 @@
 import "jest";
-import {currentSession, login} from "./auth";
+import { getSession} from "./auth";
 import {ISession} from "../contracts";
 import {TestEntityDocument} from "./test.entity";
 
@@ -11,7 +11,7 @@ let testDoc: TestEntityDocument;
 describe('solid repository', () => {
 
     beforeAll(async () => {
-        session = await currentSession() ?? await login();
+        session = await getSession();
         testDoc = new TestEntityDocument(`${pod}/tmp/test.ttl`);
         await testDoc.Init();
     }, 10000);
