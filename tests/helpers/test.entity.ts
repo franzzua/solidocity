@@ -9,10 +9,10 @@ import {
     EntitySet,
     field,
     ValuesSet
-} from "../repository";
+} from "../../repository";
 import {schema} from "rdf-namespaces";
-import {Collection} from "../repository/collection";
-import {DocumentSet} from "../repository/document-set";
+import {Collection} from "../../repository/collection";
+import {DocumentSet} from "../../repository/document-set";
 
 const pod = 'https://fransua.inrupt.net';
 

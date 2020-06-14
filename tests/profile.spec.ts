@@ -1,7 +1,7 @@
 import "jest";
 import {Profile} from "../repository";
 import { acl } from "rdf-namespaces";
-import {getSession} from "./auth";
+import {getSession} from "./helpers/auth";
 import {ISession} from "../contracts";
 
 let session: ISession;
@@ -35,6 +35,12 @@ describe('solid profile', () => {
         newApp.Save();
         await profile.Save();
         await profile.Init();
-        console.log(profile.Me.TrustedApps.Items.map(x => x.Origin));
+        const existed = profile.Me.TrustedApps.Items.filter(x => x.Origin == newApp.Origin)
+        expect(existed.length).toBeGreaterThan(0);
+        for (let trustedApp of existed) {
+            trustedApp.Remove();
+        }
+        await profile.Save();
+
     }, 20000);
 });

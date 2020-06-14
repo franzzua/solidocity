@@ -1,7 +1,7 @@
 import "jest";
-import { getSession} from "./auth";
+import { getSession} from "./helpers/auth";
 import {ISession} from "../contracts";
-import {TestEntityDocument} from "./test.entity";
+import {TestEntityDocument} from "./helpers/test.entity";
 
 const pod = 'https://fransua.inrupt.net';
 
@@ -32,4 +32,8 @@ describe('solid repository', () => {
         entity.Save();
         await entity.Document.Save()
     }, 20000);
+
+    afterAll(async () => {
+        await testDoc.Remove();
+    })
 });

@@ -1,5 +1,5 @@
-import {TestEntityCollection, TestEntityDocument} from "./test.entity";
-import { getSession, POD} from "./auth";
+import {TestEntityCollection, TestEntityDocument} from "./helpers/test.entity";
+import { getSession, POD} from "./helpers/auth";
 
 describe('collection', ()=>{
     const collection = new TestEntityCollection(`${POD}/private/r2`);

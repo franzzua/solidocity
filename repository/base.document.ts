@@ -3,7 +3,9 @@ import {EntitySet} from "./entity-set";
 import {fetchDocument, TripleDocument} from "tripledoc";
 import {Reference} from "../contracts";
 import {WebSocket} from "websocket-polyfill";
-const  Fetch = require("../impl/fetch");
+import {fs} from "../impl/file.service";
+
+const Fetch = require("../impl/fetch");
 
 export abstract class BaseDocument {
     /** @internal **/
@@ -25,11 +27,11 @@ export abstract class BaseDocument {
         this.Subscribe(this.URI);
     }
 
-    private ReloadPromise = Promise.resolve();
+    public Loading = Promise.resolve();
 
     public async Reload() {
-        await this.ReloadPromise;
-        await (this.ReloadPromise = new Promise<void>(async resolve => {
+        await this.Loading;
+        await (this.Loading = new Promise<void>(async resolve => {
             try {
                 this.doc = await fetchDocument(this.URI);
             } catch (e) {
@@ -37,17 +39,25 @@ export abstract class BaseDocument {
             }
             if (!this.doc)
                 return;
-            const fieldInfos = Metadata.Fields.get(this.constructor) ?? [];
-            for (const info of fieldInfos) {
-                this.loadField(info);
-            }
+            this.loadFields();
             resolve();
         }));
+    }
+
+    protected loadFields(){
+
+        const fieldInfos = Metadata.Fields.get(this.constructor) ?? [];
+        for (const info of fieldInfos) {
+            this.loadField(info);
+        }
     }
 
     /** @internal **/
     protected loadField(info: IFieldInfo) {
         const entityInfo = Metadata.Entities.get(info.Constructor);
+        if (info.isArray) {
+            (this[info.field] as EntitySet<any>).Preload();
+        }
         const subjects = this.doc.getAllSubjectsOfType(entityInfo.TypeReference);
         if (info.isArray) {
             (this[info.field] as EntitySet<any>).Load(subjects ?? []);
@@ -67,7 +77,7 @@ export abstract class BaseDocument {
     public async Save() {
         this.isSaving = true;
         await this.SavePromise$;
-        await this.ReloadPromise;
+        await this.Reload();
         this.isSaving = true;
         await (this.SavePromise$ = new Promise<void>(async resolve => {
             try {
@@ -79,16 +89,23 @@ export abstract class BaseDocument {
             }
             resolve();
         }));
+        this.loadFields();
+        const fieldInfos = Metadata.Fields.get(this.constructor) ?? [];
+        for (const info of fieldInfos) {
+            if (info.isArray) {
+                (this[info.field] as EntitySet<any>).Save();
+            }
+        }
         this.isSaving = false;
-        //await this.Reload();
     }
 
 
     public async Remove() {
-        await Fetch(this.URI, {method: 'DELETE'});
-        this.listeners.delete.forEach(f => f(new CustomEvent('delete', {
+        await fs.deleteFile(this.URI);
+        this.listeners.delete.forEach(f => f({
+            type: 'delete',
             detail: this
-        })));
+        }));
     }
 
     private _webSocketCache: Promise<WebSocket>;
@@ -102,25 +119,25 @@ export abstract class BaseDocument {
         return this._webSocketCache = new Promise(resolve => ws.onopen = resolve).then(() => ws);
     }
 
-    public Subscribe(uri: Reference = this.URI) {
-        this.GetWebSocket().then(ws => {
-            ws.send(`sub ${uri}`);
-            ws.onmessage = async message => {
-                const [, action, reference] = message.data.match(/(ack|pub) (.*)/);
-                switch (action) {
-                    case "ack":
-                        break;
-                    case "pub":
-                        break;
-                }
-                if (!this.isSaving) {
-                    await this.Reload();
-                    this.listeners.update.forEach(f => f(new CustomEvent('update', {
-                        detail: this
-                    })));
-                }
+    public async Subscribe(uri: Reference = this.URI, cb?: () => void) {
+        const ws = await this.GetWebSocket();
+        ws.send(`sub ${uri}`);
+        ws.onmessage = async message => {
+            const [, action, reference] = message.data.match(/(ack|pub) (.*)/);
+            switch (action) {
+                case "ack":
+                    break;
+                case "pub":
+                    if (!this.isSaving) {
+                        cb && cb();
+                        await this.Reload();
+                        this.listeners.update.forEach(f => f({
+                            type: 'update',
+                            detail: this
+                        }));
+                    }
             }
-        })
+        };
     }
 
 

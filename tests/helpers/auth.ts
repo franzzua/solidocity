@@ -1,5 +1,5 @@
 import * as nodeFetch from "node-fetch";
-import {useFetch, useSession} from "../impl/auth";
+import {useFetch, useSession} from "../../impl/auth";
 
 const fetch = require("fetch");
 useFetch(fetch);

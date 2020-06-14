@@ -34,6 +34,7 @@
   "devDependencies": {
     "@hypertype/tools": "^3.3.17",
     "@interop-alliance/oidc-rp": "^0.11.1",
+    "@testdeck/jest": "^0.1.0",
     "@types/jest": "^25.2.3",
     "@types/node": "^14.0.4",
     "@types/pretty-format": "^24.3.0",
@@ -52,7 +53,8 @@
     "symbol-observable": "^1.2.0",
     "tripledoc": "^4.3.4",
     "ts-jest": "^26.0.0",
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.3",
+    "ws": "^7.3.0"
   },
   "hypertype": {
     "worker": {
