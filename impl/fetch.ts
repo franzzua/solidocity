@@ -8,5 +8,6 @@ const Fetch: typeof window.fetch & { fetch?: typeof window.fetch, default: typeo
     };
 
 Fetch.default = Fetch;
-global.fetch = Fetch;
+if (!global.fetch)
+    global.fetch = Fetch;
 module.exports = Fetch;

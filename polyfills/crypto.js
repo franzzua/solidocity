@@ -1,4 +1,4 @@
-if (!global.crypto){
-    global.crypto = require('crypto');
-}
+// if (!global.crypto){
+//     global.crypto = require('crypto');
+// }
 module.exports= global.crypto;

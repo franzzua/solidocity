@@ -1,7 +1,8 @@
-import { ISession } from "./contracts";
-import { useSession } from "./impl/auth";
+import {ISession} from "./contracts";
+import {useFetch, useSession} from "./impl/auth";
+
 export * from "./repository"
 
 export {
-    useSession, ISession
+    useSession, ISession, useFetch
 }

@@ -77,7 +77,7 @@ export abstract class BaseDocument {
     public async Save() {
         this.isSaving = true;
         await this.SavePromise$;
-        await this.Reload();
+        // await this.Reload();
         this.isSaving = true;
         await (this.SavePromise$ = new Promise<void>(async resolve => {
             try {
