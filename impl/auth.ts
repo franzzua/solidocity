@@ -1,5 +1,6 @@
 import {ISession} from "../contracts";
 import * as auth from "solid-auth-client-real/lib/authn-fetch.js";
+import { fs } from "./file.service";
 const  Fetch = require("node-fetch");
 
 export const store = (() => {
@@ -21,7 +22,8 @@ export function useFetch( fetch: typeof window.fetch) {
     Object.assign(Fetch, fetch);
     Fetch.fetch = (req, options) => {
         return auth.authnFetch(store, fetch, req, options);
-    }
+    };
+    fs.fetch = Fetch.fetch
 }
 
 export async function useSession(session: ISession) {

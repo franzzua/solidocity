@@ -21,7 +21,7 @@
   "optionalDependencies": {
     "node-fetch": "*",
     "solid-auth-cli": "*",
-    "solid-auth-client": "*"
+    "solid-auth-client": "^2.5.0"
   },
   "peerDependencies": {
     "rdf-namespaces": "^1.8.0"
@@ -35,10 +35,10 @@
     "@hypertype/tools": "^3.3.17",
     "@interop-alliance/oidc-rp": "^0.11.1",
     "@testdeck/jest": "^0.1.0",
-    "@types/rdf-js": "^2.0.11",
     "@types/jest": "^25.2.3",
     "@types/node": "^14.0.4",
     "@types/pretty-format": "^24.3.0",
+    "@types/rdf-js": "^2.0.11",
     "jest": "^26.0.1",
     "jest-diff": "^26.0.1",
     "mime-types": "^2.1.27",
@@ -49,7 +49,7 @@
     "rdf-namespaces": "^1.8.0",
     "rdflib": "^1.2.2",
     "solid-auth-cli": "^1.0.14",
-    "solid-file-client": "^1.0.5",
+    "solid-file-client": "latest",
     "solid-file-fns": "^1.0.0",
     "symbol-observable": "^1.2.0",
     "tripledoc": "^4.3.4",
@@ -64,6 +64,7 @@
     },
     "node": {
       "index": "./dist/esm/index.js",
+      "target": "node.js",
       "type": "node"
     },
     "web": {
