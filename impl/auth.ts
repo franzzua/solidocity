@@ -1,7 +1,7 @@
 import {ISession} from "../contracts";
 import * as auth from "solid-auth-client-real/lib/authn-fetch.js";
 import { fs } from "./file.service";
-const  Fetch = require("node-fetch");
+const Fetch = require("./fetch");
 
 export const store = (() => {
     let store = {};
