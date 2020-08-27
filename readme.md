@@ -58,13 +58,7 @@ export class Person extends Entity{
 * **auth functions** 
     * `useSession(session)` - registers session and use it on requests
     * `useFetch(fetch)` - registers fetch function 
-    * `async login({idp, username, password}): ISession` - **NodeJS only!** - login with provided credentials
-    * `async login(filepath: string = '~/.solid-auth-cli-config.json'): ISession` - **NodeJS only!** - login with credentials from filepath ({idp, username, passowrd} in json format)
-    * `async login(idp?, config?: {clientName, logoUri, contacts}): ISession` - **Browser only!** -  logins with specified IDP or without specified one. More info at [solid-auth-cli](https://github.com/solid/solid-auth-client)
-    * `async loginPopup(...): ISession` -  **Browser only!** - same as previous
-    * `async fetch(url, options)` - send requests to POD. same as browser [fetch](https://developer.mozilla.org/ru/docs/Web/API/WindowOrWorkerGlobalScope/fetch)  
-    * `async currentSession(): ISession` - returns current session if it exists
-    
+
 * **Document** base class representing file in POD.
     * `constructor(uri)` - file uri
     * `async Init()` - loads file, on error creates it, on error throws it. All fields of Document will be available after Init.
