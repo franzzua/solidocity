@@ -109,7 +109,8 @@ export class Entity {
             }
         }
         const currentType = Metadata.Entities.get(this.constructor).TypeReference;
-        this.Subject.setRef(rdf.type, currentType);
+        if (this.Subject.getRef(rdf.type) != currentType)
+            this.Subject.setRef(rdf.type, currentType);
     }
 
     public Assign(data: Omit<this, keyof Entity>) {

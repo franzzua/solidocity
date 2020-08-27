@@ -5,10 +5,11 @@
 
 Before usage you should provide fetch and auth library like this:
 ```typescript
-import * as auth from "solid-auth-cli"; // use solid-auth-client in browser
-import {useAuth} from "solidocity";
-const {login, loginPopup, fetch, getSession} = useAuth(auth);
-await login();
+import * as auth from "solid-auth-client"; // use solid-auth-cli in NodeJS
+import {useSession, useFetch} from "solidocity";
+useFetch(fetch);  // use default fetch from window
+const session = await auth();
+useSession(session);
 ```
 
 Really simple:
@@ -31,7 +32,7 @@ export class Profile extends Document {
     @entityField(Person)
     public Me: Person;
 
-    @entityField(Person, true)
+    @entitySet(ContextEntity, {isArray: true})
     public OtherPeople: EntitySet<Person>;
 
 }
@@ -44,6 +45,10 @@ export class Person extends Entity{
 
     @field(vcard.role)
     public Role: string;
+
+    @field(schema.children, {type: "ref", isArray: true, isOrdered: true})
+    public Children: ValuesSet<string>;
+
 }
 ```
 
@@ -51,7 +56,8 @@ export class Person extends Entity{
 * supports ACL-files for reading and writing permissions
 
 * **auth functions** 
-    * `useAuth(auth)` - register platform dependent fetch and auth functions
+    * `useSession(session)` - registers session and use it on requests
+    * `useFetch(fetch)` - registers fetch function 
     * `async login({idp, username, password}): ISession` - **NodeJS only!** - login with provided credentials
     * `async login(filepath: string = '~/.solid-auth-cli-config.json'): ISession` - **NodeJS only!** - login with credentials from filepath ({idp, username, passowrd} in json format)
     * `async login(idp?, config?: {clientName, logoUri, contacts}): ISession` - **Browser only!** -  logins with specified IDP or without specified one. More info at [solid-auth-cli](https://github.com/solid/solid-auth-client)
@@ -64,12 +70,14 @@ export class Person extends Entity{
     * `async Init()` - loads file, on error creates it, on error throws it. All fields of Document will be available after Init.
     * `async Save()` - saves document ot file on POD; on error throws it.
     * `Acl: AclDocument` - control document permissions. By default, they are inherited from parent folder. 
-
+    * `Subscribe()` - reloads document on external changes
+    * `on('update'|'delete', listener)` -  subscribe for changes
+    
 * **Entity** base class representing all values with same Subject in POD file
    * <s>`constructor(uri)`</s> for internal use only
    * `Save()` saves entity changes into document but not to a server
    * `Assign(data)` same as Object.assign
-   * `Remvove()` deletes entity from document
+   * `Remove()` deletes entity from document
    * `Id` entity URI
    * `Document`entity owner
 
@@ -82,8 +90,6 @@ export class Person extends Entity{
 * **AclDocument**
     * `async InitACL(owner: ownerURI, ...modes: Reference[])` creates new .acl file that grants control,read,write to owner and choosed rights to everybody 
 
-* **fs** - For creating files and directories. Documented in [api.d.ts](./dist/typings/contracts/api.d.ts)
- 
 ```
 @field(predicate, {
     type: 'string' | 'ref' | 'Date' | 'decimal', // string by default
