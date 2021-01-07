@@ -3,7 +3,6 @@ import {BaseDocument} from "./base.document";
 import {TripleSubject} from "tripledoc";
 import {Metadata} from "./metadata";
 import {Reference} from "../contracts";
-import { rdf } from "rdf-namespaces";
 
 export class EntitySet<TEntity extends Entity> {
     constructor(protected document: BaseDocument,
@@ -29,8 +28,8 @@ export class EntitySet<TEntity extends Entity> {
     private _added: TEntity[] = [];
     private _removed: TEntity[] = [];
 
-    public Remove(id){
-        this._removed.push(id);
+    public Remove(entity: TEntity){
+        this._removed.push(entity);
     }
 
     Preload(){
@@ -63,7 +62,7 @@ export class EntitySet<TEntity extends Entity> {
                         // item.Load();
                         return item;
                     }
-                    console.log('new item', x.asRef());
+                    // console.log('new item', x.asRef());
                     return new this.itemConstructor(x.asRef(), this.document)
                 })
                 .map(x => [x.Id, x] as [Reference, TEntity]),

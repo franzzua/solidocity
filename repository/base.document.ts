@@ -133,6 +133,7 @@ export abstract class BaseDocument {
                         await this.Reload();
                         this.listeners.update.forEach(f => f({
                             type: 'update',
+                            reference,
                             detail: this
                         }));
                     }
