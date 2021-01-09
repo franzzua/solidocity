@@ -64,7 +64,7 @@ export class Collection extends Document{
         const subject = this.doc.getSubject(`${this.URI}#${field.toString()}`)
             ?? this.doc.addSubject({identifier: field.toString()});
         if (subject.getRef(ldp.contains) !== doc.URI) {
-            subject.setRef(ldp.contains, doc.URI);
+            subject.addRef(ldp.contains, doc.URI);
             await this.doc.save();
         }
         this.Documents.push(doc);
