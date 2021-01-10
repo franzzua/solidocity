@@ -1,6 +1,6 @@
 const webpack = require('webpack')
 module.exports = {
-    externals: ['solid-auth-cli', 'websocket', '@trust/webcrypto', 'readable-stream', 'rdf-namespaces', 'solid-auth-cli', 'iconv-lite', 'asn1js'],
+    externals: ['solid-auth-cli', 'websocket', '@trust/webcrypto', 'rdf-namespaces', 'solid-auth-cli'],
     resolve: {
         alias: {
             // 'node-fetch$': `${__dirname}/dist/esm/impl/fetch.js`,
