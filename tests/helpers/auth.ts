@@ -1,8 +1,4 @@
-import * as nodeFetch from "node-fetch";
-import {useFetch, useSession} from "../../impl/auth";
-
-const fetch = require("fetch");
-useFetch(fetch);
+import {useSession} from "../../impl/store";
 
 import * as auth from 'solid-auth-cli';
 

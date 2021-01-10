@@ -1,31 +1,26 @@
-import {ISession} from "../contracts";
-import * as auth from "solid-auth-client-real/lib/authn-fetch.js";
-import { fs } from "./file.service";
-const Fetch = require("./fetch");
+import {getSession} from "./store";
+import {PoPToken} from "./poPToken";
 
-export const store = (() => {
-    let store = {};
-    return {
-        async getItem(key) {
-            return store[key];
-        },
-        async setItem(key, value) {
-            if (typeof value == "object")
-                store[key] = JSON.stringify({session: value});
-            else
-                store[key] = value;
-        }
+export const authFetch = (async (url, request: RequestInit) => {
+    // console.info('request', url, request.method);
+    const session = await getSession();
+    if (session) {
+        request = request || {};
+        request.method = request.method || 'GET';
+        request.headers = request.headers || {};
+        const token = await PoPToken.issueFor(url, session);
+//         saveIdentityManager(identityManager, settingsFile)
+        request.credentials = "include";
+        request.headers['authorization'] = `Bearer ${token}`;
     }
-})();
+    const result = await authFetch.real(url, request);
+    // console.log(result);
+    return result;
+}) as Window["fetch"] & {real: Window["fetch"]};
 
-export function useFetch( fetch: typeof window.fetch) {
-    Object.assign(Fetch, fetch);
-    Fetch.fetch = (req, options) => {
-        return auth.authnFetch(store, fetch, req, options);
-    };
-    fs.fetch = Fetch.fetch
+export function useFetch(fetch){
+    authFetch.real = fetch;
 }
 
-export async function useSession(session: ISession) {
-    await store.setItem('solid-auth-client', session);
-}
+
+export const fetch = authFetch;

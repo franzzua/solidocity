@@ -17,14 +17,9 @@ module.exports = {
     ],
     moduleNameMapper: {
         ...pathsToModuleNameMapper(compilerOptions.paths, {prefix: '<rootDir>/'}),
-        'node-fetch$': `<rootDir>/dist/esm/impl/fetch.js`,
-        'fetch': `<rootDir>/node_modules/node-fetch/lib/index.js`,
-        'solid-auth-client': '<rootDir>/polyfills/solid-auth-client.js',
-        'solid-auth-client-real': '<rootDir>/node_modules/solid-auth-client/lib/authn-fetch.js',
+        'solid-auth-client': `<rootDir>/entry/node.ts`,
         'text-encoding$': `<rootDir>/polyfills/text-encoder.js`,
         '@sinonjs/text-encoding$': `<rootDir>/polyfills/text-encoder.js`,
         'whatwg-url$': `<rootDir>/polyfills/whatwg-url.js`,
-        'websocket-polyfill$': `<rootDir>/polyfills/websocket.js`
-        //'@trust/webcrypto': `<rootDir>/polyfills/crypto.js`,
     }
 };

@@ -19,7 +19,7 @@ export class DocumentSet<TDocument extends Document> {
             return this.documentsMap.get(uri);
         }
         const document = new this.type(uri);
-        await document.Init();
+        //await document.Init();
         this.documentsMap.set(uri, document);
         return document;
     }
@@ -47,5 +47,6 @@ export class DocumentSet<TDocument extends Document> {
         for (const x of this.Documents) {
             await x.Remove();
         }
+        this.documentsMap.clear();
     }
 }

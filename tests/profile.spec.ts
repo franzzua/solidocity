@@ -1,4 +1,5 @@
 import "jest";
+import  "../entry/node";
 import {Profile} from "../repository";
 import { acl } from "rdf-namespaces";
 import {getSession} from "./helpers/auth";

@@ -6,8 +6,7 @@
 Before usage you should provide fetch and auth library like this:
 ```typescript
 import * as auth from "solid-auth-client"; // use solid-auth-cli in NodeJS
-import {useSession, useFetch} from "solidocity";
-useFetch(fetch);  // use default fetch from window
+import {useSession} from "solidocity";
 const session = await auth();
 useSession(session);
 ```

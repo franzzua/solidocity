@@ -104,6 +104,7 @@ export class Entity {
             } else {
                 const value = getSubjectValue(this.Subject, info);
                 if (!info.equal(value, this[key])){
+                    this.Subject.removeAll(info.predicate);
                     setSubjectValue(this.Subject, info, this[key]);
                 }
             }

@@ -2,10 +2,7 @@ import {IFieldInfo, Metadata} from "./metadata";
 import {EntitySet} from "./entity-set";
 import {fetchDocument, TripleDocument} from "tripledoc";
 import {Reference} from "../contracts";
-import {WebSocket} from "websocket-polyfill";
-import {fs} from "../impl/file.service";
-
-const Fetch = require("../impl/fetch");
+import { authFetch } from "../impl/auth";
 
 export abstract class BaseDocument {
     /** @internal **/
@@ -101,22 +98,24 @@ export abstract class BaseDocument {
 
 
     public async Remove() {
-        await fs.deleteFile(this.URI);
+        await authFetch(this.URI, {method: 'DELETE'});
         this.listeners.delete.forEach(f => f({
             type: 'delete',
             detail: this
         }));
     }
 
-    private _webSocketCache: Promise<WebSocket>;
+    private static _webSocketCache = new Map<Reference, Promise<WebSocket>>();
 
     private async GetWebSocket() {
-        if (this._webSocketCache)
-            return this._webSocketCache;
-        const optRes = await Fetch(this.URI, {method: 'GET'})
-        const wssUrl = optRes.headers.get('updates-via');
+        const wssUrl = this.doc.getWebSocketRef();
+        if (BaseDocument._webSocketCache.has(wssUrl)){
+            return await BaseDocument._webSocketCache.get(wssUrl);
+        }
         const ws = new WebSocket(wssUrl);
-        return this._webSocketCache = new Promise(resolve => ws.onopen = resolve).then(() => ws);
+        const wsPromise = new Promise(resolve => ws.onopen = resolve).then(() => ws);
+        BaseDocument._webSocketCache.set(wssUrl, wsPromise);
+        return await wsPromise;
     }
 
     public async Subscribe(uri: Reference = this.URI, cb?: () => void) {
@@ -139,6 +138,13 @@ export abstract class BaseDocument {
                     }
             }
         };
+    }
+
+    public async Unsubscribe(){
+        const ws = await this.GetWebSocket();
+        this.listeners.update = [];
+        this.listeners.delete = [];
+        ws.close();
     }
 
 

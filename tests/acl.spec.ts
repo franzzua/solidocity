@@ -1,6 +1,6 @@
 import "jest";
 import {getSession} from "./helpers/auth";
-import {document, Document, entitySet, Person} from "../index";
+import {document, Document, entitySet, Person} from "../entry/node";
 import {acl} from "rdf-namespaces";
 import {ISession} from "../contracts";
 

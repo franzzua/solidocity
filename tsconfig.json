@@ -6,6 +6,7 @@
     "outDir": "./dist/esm",
     "declaration": true,
     "declarationMap": true,
+    "allowJs": true,
     "stripInternal": true,
     "declarationDir": "./dist/typings",
     "experimentalDecorators": true,
@@ -19,16 +20,11 @@
     ],
     "types": [
       "node",
+      "rdf-js",
       "symbol-observable",
       "jest"
     ],
     "paths": {
-      "solid-auth-client-real/*": [
-        "node_modules/solid-auth-client/*"
-      ],
-      "websocket-polyfill": [
-        "./polyfills/websocket.js"
-      ]
     }
   },
   "exclude": [
