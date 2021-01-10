@@ -1,6 +1,6 @@
 {
   "name": "solidocity",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "browser": "dist/index.js",
   "main": "dist/node.js",
   "server": "dist/node.js",
@@ -67,6 +67,5 @@
       "type": "web"
     }
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
