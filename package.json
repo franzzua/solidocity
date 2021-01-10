@@ -1,6 +1,6 @@
 {
   "name": "solidocity",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "browser": "dist/index.js",
   "main": "dist/node.js",
   "server": "dist/node.js",
@@ -25,8 +25,7 @@
     "solid-auth-cli": "*",
     "solid-auth-client": "^2.5.0"
   },
-  "peerDependencies": {
-  },
+  "peerDependencies": {},
   "files": [
     "dist",
     "polyfills",
