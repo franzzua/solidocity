@@ -32,7 +32,7 @@ export class EntitySet<TEntity extends Entity> {
         this._removed.push(entity);
     }
 
-    Preload(){
+    Save(){
         for (let entity of this._added) {
             if (!entity.Subject) {
                 const [prefix, id] = entity.Id.split('#');
@@ -73,7 +73,7 @@ export class EntitySet<TEntity extends Entity> {
         // console.log('load entity set', entries.length, this._added.length);
     }
 
-    public Save() {
+    public Preload() {
         this._added = [];
         this._removed = [];
     }

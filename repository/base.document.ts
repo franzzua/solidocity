@@ -21,7 +21,7 @@ export abstract class BaseDocument {
         }
         await this.Reload();
         //console.log(`subscribe ${this.URI}`);
-        this.Subscribe(this.URI);
+        // this.Subscribe(this.URI);
     }
 
     public Loading = Promise.resolve();
@@ -76,6 +76,12 @@ export abstract class BaseDocument {
         await this.SavePromise$;
         // await this.Reload();
         this.isSaving = true;
+        const fieldInfos = Metadata.Fields.get(this.constructor) ?? [];
+        for (const info of fieldInfos) {
+            if (info.isArray) {
+                (this[info.field] as EntitySet<any>).Save();
+            }
+        }
         await (this.SavePromise$ = new Promise<void>(async resolve => {
             try {
                 this.doc = await this.doc.save();
@@ -87,12 +93,6 @@ export abstract class BaseDocument {
             resolve();
         }));
         this.loadFields();
-        const fieldInfos = Metadata.Fields.get(this.constructor) ?? [];
-        for (const info of fieldInfos) {
-            if (info.isArray) {
-                (this[info.field] as EntitySet<any>).Save();
-            }
-        }
         this.isSaving = false;
     }
 
