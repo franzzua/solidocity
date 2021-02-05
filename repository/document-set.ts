@@ -24,7 +24,7 @@ export class DocumentSet<TDocument extends Document> {
         return document;
     }
 
-    private documentsMap = new Map<Reference, TDocument>();
+    public documentsMap = new Map<Reference, TDocument>();
 
     public get Documents(): ReadonlyArray<TDocument> {
         return [...this.documentsMap.values()];

@@ -3,8 +3,6 @@
   "version": "1.2.7",
   "browser": "dist/index.js",
   "main": "dist/node.js",
-  "server": "dist/node.js",
-  "es6": "dist/index.js",
   "typings": "dist/typings/entry/web.d.ts",
   "scripts": {
     "build": "tsc --watch",
@@ -32,26 +30,24 @@
     "readme.md"
   ],
   "dependencies": {
-    "rdf-namespaces": "^1.8.0"
+    "rdf-namespaces": "latest"
   },
   "devDependencies": {
-    "@hypertype/tools": "^3.5.2",
-    "@interop-alliance/oidc-rp": "^0.11.1",
-    "@testdeck/jest": "^0.1.2",
-    "@types/jest": "^25.2.3",
-    "@types/node": "^14.14.20",
-    "jest": "^26.6.3",
-    "jest-diff": "^26.6.2",
-    "node-fetch": "^2.6.0",
-    "rdf-namespaces": "^1.9.2",
-    "solid-auth-cli": "^1.0.14",
+    "@hypertype/tools": "latest",
+    "@testdeck/jest": "latest",
+    "@types/jest": "latest",
+    "@types/node": "latest",
+    "jest": "latest",
+    "jest-diff": "latest",
+    "node-fetch": "latest",
+    "solid-auth-cli": "latest",
     "solid-file-client": "latest",
-    "solid-file-fns": "^1.0.0",
-    "symbol-observable": "^1.2.0",
-    "tripledoc": "4.4.0",
-    "ts-jest": "^26.4.4",
+    "solid-file-fns": "latest",
+    "symbol-observable": "latest",
+    "tripledoc": "latest",
+    "ts-jest": "latest",
     "typescript": "^3.9.7",
-    "ws": "^7.4.2"
+    "ws": "latest"
   },
   "hypertype": {
     "worker": {

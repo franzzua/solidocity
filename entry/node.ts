@@ -16,7 +16,6 @@ const fixedFetch = async (url, options) => {
 
 
 export {ISession} from "../contracts";
-export {useSession} from "../impl/store";
 export * from "../repository"
 
 

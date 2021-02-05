@@ -1,4 +1,4 @@
-import {AclDocument} from "./acl.document";
+import {AclDocument} from "./acl/acl.document";
 import {Constructor, Metadata} from "./metadata";
 import {Entity, EntityConstructor} from "./entity";
 import {BaseDocument} from "./base.document";

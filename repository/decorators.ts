@@ -21,6 +21,14 @@ export const field: (reference: Reference, info?: IFieldInfo) => PropertyDecorat
     = (reference, info = {type: "string"}) => (target, key: string | symbol) => {
     Metadata.addField(target, key, reference, info);
 };
+export const valuesSet: (reference: Reference, info?: IFieldInfo) => PropertyDecorator
+    = (reference, info = {type: "string"}) => (target, key: string | symbol) => {
+    Metadata.addField(target, key, reference, {
+        ...info,
+        isArray: true,
+        isOrdered: true
+    });
+};
 
 export const collection: (info?: ICollectionInfo) => ClassDecorator = (info: ICollectionInfo) => target => {
     Metadata.Collections.set(target.constructor, info ?? {

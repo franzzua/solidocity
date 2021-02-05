@@ -23,6 +23,8 @@ class DocumentRecordDocument extends Document {
     public Records: EntitySet<DocumentRecord>;
 }
 
+const contains = 'http://context.app/types#contains';
+
 export class Collection extends Document {
 
     private Documents: Document[];
@@ -56,7 +58,7 @@ export class Collection extends Document {
         const infos = Metadata.DocumentSets.get(this.constructor);
         for (let info of infos) {
             const subject = this.doc.getSubject(`${this.URI}#${info.Field.toString()}`);
-            const refs = subject.getAllRefs(ldp.contains);
+            const refs = subject.getAllRefs(contains);
             for (let ref of refs) {
                 const doc = await (this[info.Field] as DocumentSet<any>).Load(ref);
                 this.Documents.push(doc);
@@ -68,8 +70,8 @@ export class Collection extends Document {
     public async RegisterDoc(field: string | symbol, doc: Document) {
         const subject = this.doc.getSubject(`${this.URI}#${field.toString()}`)
             ?? this.doc.addSubject({identifier: field.toString()});
-        if (!subject.getAllRefs(ldp.contains).includes(doc.URI)) {
-            subject.addRef(ldp.contains, doc.URI);
+        if (!subject.getAllRefs(contains).includes(doc.URI)) {
+            subject.addRef(contains, doc.URI);
             await this.doc.save();
         }
         this.Documents.push(doc);
