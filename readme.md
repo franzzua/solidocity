@@ -66,7 +66,7 @@ export class Person extends Entity{
     * `Subscribe()` - reloads document on external changes
     * `on('update'|'delete', listener)` -  subscribe for changes
     
-* **Entity** base class representing all values with same Subject in POD file
+* **Entity** base class representing all triplets with same Subject in POD file
    * <s>`constructor(uri)`</s> for internal use only
    * `Save()` saves entity changes into document but not to a server
    * `Assign(data)` same as Object.assign
@@ -94,7 +94,7 @@ Decorated field should has type
 - string | Reference | Date | number
 - Array<string | Reference | Date | number>
 - ValuesSet<string | Reference | Date | number>
-It will be initialized on `Document.Init();`
-   
 
-  
+It will be initialized after `Document.Init();` or `Document.Save()`
+   
+ 
