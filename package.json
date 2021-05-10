@@ -20,7 +20,7 @@
   "description": "",
   "optionalDependencies": {
     "node-fetch": "*",
-    "solid-auth-cli": "*",
+    "solid-auth-cli": "^1.0.15",
     "solid-auth-client": "^2.5.0"
   },
   "peerDependencies": {},
@@ -30,7 +30,9 @@
     "readme.md"
   ],
   "dependencies": {
-    "rdf-namespaces": "latest"
+    "rdf-namespaces": "latest",
+    "solid-node-client": "^2.0.4",
+    "symbol-observable": "latest"
   },
   "devDependencies": {
     "@hypertype/tools": "latest",
@@ -40,10 +42,9 @@
     "jest": "latest",
     "jest-diff": "latest",
     "node-fetch": "latest",
-    "solid-auth-cli": "latest",
+    "solid-auth-fetcher": "^1.5.2",
     "solid-file-client": "latest",
     "solid-file-fns": "latest",
-    "symbol-observable": "latest",
     "tripledoc": "latest",
     "ts-jest": "latest",
     "typescript": "^3.9.7",

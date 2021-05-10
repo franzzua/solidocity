@@ -6,7 +6,7 @@ const {compilerOptions} = require('./tsconfig');
 module.exports = {
     "globals": {
         "ts-jest": {
-            "tsConfig": "tsconfig.json"
+            "tsconfig": "tsconfig.json"
         }
     },
     testEnvironment: "node",
@@ -20,6 +20,7 @@ module.exports = {
         'solid-auth-client': `<rootDir>/entry/node.ts`,
         'text-encoding$': `<rootDir>/polyfills/text-encoder.js`,
         '@sinonjs/text-encoding$': `<rootDir>/polyfills/text-encoder.js`,
+        '^base64url$': `<rootDir>/node_modules/base64url/index.js`,
         'whatwg-url$': `<rootDir>/polyfills/whatwg-url.js`,
     }
 };

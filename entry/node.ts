@@ -19,3 +19,4 @@ export {ISession} from "../contracts";
 export * from "../repository"
 
 
+export {fetch} from "../impl/auth";

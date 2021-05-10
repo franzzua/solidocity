@@ -1,17 +1,17 @@
 import "jest";
-import { getSession} from "./helpers/auth";
+import {getSession, POD} from "./helpers/auth";
 import {ISession} from "../contracts";
 import {TestEntityDocument} from "./helpers/test.entity";
 
 
-let session: ISession & { pod };
+let session: ISession;
 let testDoc: TestEntityDocument;
 
 describe('solid repository', () => {
 
     beforeAll(async () => {
         session = await getSession();
-        testDoc = new TestEntityDocument(`${session.pod}/tmp/test.ttl`);
+        testDoc = new TestEntityDocument(`${POD}/test.ttl`);
         await testDoc.Init();
     }, 20000);
 

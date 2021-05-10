@@ -3,6 +3,7 @@ import {getSession} from "./helpers/auth";
 import {document, Document, entitySet, Person} from "../entry/node";
 import {acl} from "rdf-namespaces";
 import {ISession} from "../contracts";
+import {POD} from "./helpers/auth";
 
 @document()
 export class TestDocument extends Document {
@@ -16,7 +17,7 @@ describe('acl', () => {
     let session: ISession;
     beforeAll(async () => {
         session = await getSession();
-        doc = new TestDocument('https://fransua.inrupt.net/tmp/test8.ttl');
+        doc = new TestDocument(`${POD}/test8.ttl`);
         await doc.Init();
     }, 20000);
 

@@ -19,7 +19,7 @@ export class DocumentSet<TDocument extends Document> {
             return this.documentsMap.get(uri);
         }
         const document = new this.type(uri);
-        //await document.Init();
+        await document.Init();
         this.documentsMap.set(uri, document);
         return document;
     }
@@ -36,7 +36,6 @@ export class DocumentSet<TDocument extends Document> {
 
     public async Create(reference: Reference = `index.ttl`): Promise<TDocument> {
         const newDoc = new this.type(`${this.collection.folderURI}/${reference}`);
-
         await newDoc.Init();
         await this.collection.RegisterDoc(this.setField, newDoc);
         this.documentsMap.set(reference, newDoc);

@@ -19,7 +19,7 @@ export const authFetch = (async (url, request: RequestInit) => {
 export function useFetch(fetch){
     authFetch.real = fetch;
     // @ts-ignore
-    window.afetch = authFetch;
+    // window.afetch = authFetch;
 }
 
 

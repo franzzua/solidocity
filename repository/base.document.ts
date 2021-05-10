@@ -86,9 +86,12 @@ export abstract class BaseDocument {
             try {
                 this.doc = await this.doc.save();
             } catch (e) {
-                console.error(e.status);
-                await this.Reload();
-                this.doc = await this.doc.save();
+                if (e.status == '409') {
+                    await this.Reload();
+                    this.doc = await this.doc.save();
+                }else{
+                    throw e;
+                }
             }
             resolve();
         }));
@@ -107,13 +110,28 @@ export abstract class BaseDocument {
 
     private static _webSocketCache = new Map<Reference, Promise<WebSocket>>();
 
-    private async GetWebSocket() {
+    private async getWebSocketUrl(){
         const wssUrl = this.doc.getWebSocketRef();
+        if (wssUrl != null) {
+            return wssUrl;
+        }
+        const res = await authFetch(this.URI, {method: 'HEAD'});
+        if (res.headers.has('updates-via')) {
+            return res.headers.get('updates-via');
+        }
+        throw new Error("failed to find wssUrl");
+    }
+
+    private async GetWebSocket() {
+        const wssUrl = await this.getWebSocketUrl();
         if (BaseDocument._webSocketCache.has(wssUrl)){
             return await BaseDocument._webSocketCache.get(wssUrl);
         }
         const ws = new WebSocket(wssUrl);
-        const wsPromise = new Promise(resolve => ws.onopen = resolve).then(() => ws);
+        const wsPromise = new Promise((resolve,reject) => {
+            ws.addEventListener('open', resolve);
+            ws.addEventListener('error', reject);
+        }).then(() => ws);
         BaseDocument._webSocketCache.set(wssUrl, wsPromise);
         return await wsPromise;
     }
@@ -121,23 +139,26 @@ export abstract class BaseDocument {
     public async Subscribe(uri: Reference = this.URI, cb?: () => void) {
         const ws = await this.GetWebSocket();
         ws.send(`sub ${uri}`);
-        ws.onmessage = async message => {
-            const [, action, reference] = message.data.match(/(ack|pub) (.*)/);
-            switch (action) {
-                case "ack":
-                    break;
-                case "pub":
-                    if (!this.isSaving) {
-                        cb && cb();
-                        await this.Reload();
-                        this.listeners.update.forEach(f => f({
-                            type: 'update',
-                            reference,
-                            detail: this
-                        }));
-                    }
-            }
-        };
+        await new Promise(resolve => {
+            ws.addEventListener('message', async message => {
+                const [, action, reference] = message.data.match(/(ack|pub) (.*)/);
+                switch (action) {
+                    case "ack":
+                        resolve();
+                        break;
+                    case "pub":
+                        if (!this.isSaving) {
+                            cb && cb();
+                            await this.Reload();
+                            this.listeners.update.forEach(f => f({
+                                type: 'update',
+                                reference,
+                                detail: this
+                            }));
+                        }
+                }
+            });
+        });
     }
 
     public async Unsubscribe(){

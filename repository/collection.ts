@@ -36,9 +36,9 @@ export class Collection extends Document {
     }
 
     public async Init() {
-        const isExists = await authFetch(this.folderURI, {method: 'HEAD'});
+        const isExists = await authFetch(this.folderURI+'/', {method: 'HEAD'});
         if (!isExists.ok)
-            await fetch(this.folderURI, {
+            await authFetch(this.folderURI+'/', {
                 method: 'POST',
                 headers: {
                     link: '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"',

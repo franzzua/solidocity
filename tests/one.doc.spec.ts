@@ -29,14 +29,14 @@ class TwoDocsSpec {
     async world() {
         const entityA = this.doc1.Entities.Add();
         entityA.Content = 'A';
-        entityA.Save();
+        // entityA.Save();
         await this.doc1.Save();
         // @ts-ignore
         expect(this.doc1.Entities.get(entityA.Id)).toEqual(entityA);
         expect(entityA.Content).toEqual('A');
         console.log(entityA.Id);
         const saves: Promise<void>[] = [];
-        for (let i = 0; i < 100; i++){
+        for (let i = 0; i < 3; i++){
             const value = `A${i}`;
             // console.log(value)
             entityA.Content = value;
