@@ -1,14 +1,12 @@
-## Data repository for Solid PODs
+## Data access library for Solid PODs. Simple and clear.
 
 * compatible with NodeJS
 * Typescript decorators metadata definitions
 
-Before usage you should provide fetch and auth library like this:
+Before usage you should provide authenticated fetch from your auth library, solid-auth-fetcher for example:
 ```typescript
-import * as auth from "solid-auth-client"; // use solid-auth-cli in NodeJS
-import {useSession} from "solidocity";
-const session = await auth();
-useSession(session);
+import {useFetch} from "solidocity";
+useFetch(fetch);
 ```
 
 Really simple:
@@ -22,10 +20,17 @@ profile.Me.Save();
 await profile.Save();
 ```
 
+Define your predicate schema:
+```typescript
+const schema = {
+   Person: '<person type definition URI>`,
+   children: '<children predicate  URI>`
+}
+```
+
 Define your models:
 
 ```typescript
-@document(schema.ProfilePage)
 export class Profile extends Document {
 
     @entityField(Person)
@@ -55,14 +60,13 @@ export class Person extends Entity{
 * supports ACL-files for reading and writing permissions
 
 * **auth functions** 
-    * `useSession(session)` - registers session and use it on requests
     * `useFetch(fetch)` - registers fetch function 
 
 * **Document** base class representing file in POD.
     * `constructor(uri)` - file uri
     * `async Init()` - loads file, on error creates it, on error throws it. All fields of Document will be available after Init.
     * `async Save()` - saves document ot file on POD; on error throws it.
-    * `Acl: AclDocument` - control document permissions. By default, they are inherited from parent folder. 
+    * `Acl: AclDocument` - control document permissions. 
     * `Subscribe()` - reloads document on external changes
     * `on('update'|'delete', listener)` -  subscribe for changes
     
