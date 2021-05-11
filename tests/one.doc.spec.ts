@@ -34,7 +34,6 @@ class TwoDocsSpec {
         // @ts-ignore
         expect(this.doc1.Entities.get(entityA.Id)).toEqual(entityA);
         expect(entityA.Content).toEqual('A');
-        console.log(entityA.Id);
         const saves: Promise<void>[] = [];
         for (let i = 0; i < 3; i++){
             const value = `A${i}`;

@@ -27,8 +27,8 @@ class TwoDocsSpec {
     @test
     @timeout(20000)
     async world() {
-        await this.doc1.Subscribe(this.doc1.URI, () => console.log('update 1'));
-        await this.doc2.Subscribe(this.doc2.URI, () => console.log('update 2'));
+        await this.doc1.Subscribe();
+        await this.doc2.Subscribe();
         const entityA1 = this.doc1.Entities.Add();
         entityA1.Content = 'A';
         entityA1.Save();
@@ -36,10 +36,22 @@ class TwoDocsSpec {
         entityB2.Content = 'B';
         entityB2.Save();
         expect(entityA1.Id).not.toBe(entityB2.Id);
+        const updates = Promise.all([
+            new Promise(resolve => this.doc1.on('update', () => {
+                resolve();
+                console.log('update doc 1', this.doc1.Entities.Items.length);
+            })),
+            new Promise(resolve => this.doc2.on('update', () => {
+                resolve();
+                console.log('update doc 2', this.doc1.Entities.Items.length);
+            })),
+        ]);
+
         await this.doc2.Save();
+        console.log('saved doc 2');
         await this.doc1.Save();
-        await this.doc2.Loading;
-        await this.doc1.Loading;
+        console.log('saved doc 1');
+        await updates;
         const entityA2 = this.doc2.Entities.get(entityA1.Id);
         const entityB1 = this.doc1.Entities.get(entityB2.Id);
         // @ts-ignore

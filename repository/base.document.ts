@@ -141,6 +141,9 @@ export abstract class BaseDocument {
         ws.send(`sub ${uri}`);
         await new Promise(resolve => {
             ws.addEventListener('message', async message => {
+                if (!message.data.match(/(ack|pub) (.*)/)){
+                    return;
+                }
                 const [, action, reference] = message.data.match(/(ack|pub) (.*)/);
                 switch (action) {
                     case "ack":
