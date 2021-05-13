@@ -42,7 +42,7 @@ class TwoDocsSpec {
             entityA.Save();
             saves.push(this.doc1.Save());
             await new Promise(resolve => setTimeout(resolve, Math.random()*300+100));
-            expect(this.doc1.Entities.get(entityA.Id)).toEqual(entityA);
+            expect(this.doc1.Entities.get(entityA.Id)).toStrictEqual(entityA);
             expect(entityA.Content).toEqual(value);
         }
 

@@ -21,6 +21,8 @@ export async function getSession(): Promise<ISession> {
     const configFile = await fs.readFile(`${home}/.solid-auth-cli-config.json`,'utf8');
     const config = JSON.parse(configFile);
     const result = await client.login(config);
+    if (!result.info.isLoggedIn)
+        throw new Error();
     // client.createServerlessPod(POD);
     // const session = (await auth.currentSession() ?? await auth.login())
     useFetch(async function (url,options) {

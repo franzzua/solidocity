@@ -82,6 +82,7 @@ export abstract class BaseDocument {
                 (this[info.field] as EntitySet<any>).Save();
             }
         }
+        this.loadFields();
         await (this.SavePromise$ = new Promise<void>(async resolve => {
             try {
                 this.doc = await this.doc.save();

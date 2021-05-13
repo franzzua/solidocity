@@ -22,13 +22,13 @@ class TwoDocsSpec {
         this.doc2 = new TestEntityDocument(`${POD}/t1.ttl`)
         await this.doc1.Init()
         await this.doc2.Init()
+        await this.doc1.Subscribe();
+        await this.doc2.Subscribe();
     }
 
     @test
     @timeout(20000)
     async world() {
-        await this.doc1.Subscribe();
-        await this.doc2.Subscribe();
         const entityA1 = this.doc1.Entities.Add();
         entityA1.Content = 'A';
         entityA1.Save();
