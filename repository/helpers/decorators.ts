@@ -21,9 +21,9 @@ export const entity: (reference?: Reference) => ClassDecorator =
         Metadata.addEntity(target, reference);
     };
 
-export const entityField: ((entity: Function, info?: Partial<IFieldInfo>) => PropertyDecorator) =
-    (constructor, info ={}) => (target, key) => {
-        Metadata.addEntityField(target, key, constructor, {...info});
+export const entityField: ((entity: Function, id, info?: Partial<IFieldInfo>) => PropertyDecorator) =
+    (constructor, id, info ={}) => (target, key) => {
+        Metadata.addEntityField(target, key, constructor, {...info, id});
     };
 export const field: (reference: Reference, info?: IFieldInfo) => PropertyDecorator
     = (reference, info = {type: "string"}) => (target, key: string | symbol) => {

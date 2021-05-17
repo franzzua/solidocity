@@ -7,9 +7,9 @@ import {ValuesSet} from "./values-set";
 import {BaseDocument} from "./base.document";
 import {TripleSubject} from "tripledoc";
 import {rdf} from "rdf-namespaces";
-import {RdfSubject} from "../rdf/RdfDocument";
 import {FieldEntitySet} from "./entity-set";
 import {Reference} from "../contracts";
+import {RdfSubject} from "../rdf/RdfSubject";
 
 /** @internal **/
 class SubjectReader {
@@ -47,14 +47,12 @@ export class Entity {
 
             if (info.type == "object"){
                 if (info.isArray){
-                    const refs = this.Subject.getValues(info.predicate, "ref") as Reference[];
-                    const subjects = refs.map(ref => this.Document.rdfDoc.getSubject(ref));
+                    const subjects = this.Subject.getLinkedSubjects(info.predicate);
                     const set = new FieldEntitySet(this.Document, info.Constructor, this.Subject);
                     set.Load(subjects);
                     this[info.field] = set;
                 }else{
-                    const ref = this.Subject.getValue(info.predicate, "ref") as Reference;
-                    const subj = this.Document.rdfDoc.getSubject(ref);
+                    const subj = this.Subject.getLinkedSubject(info.predicate);
                     this[info.field] = new info.Constructor(subj, this.Document);
                 }
             }else            {

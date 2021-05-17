@@ -37,11 +37,11 @@ class TwoDocsSpec {
         entityB2.Save();
         expect(entityA1.Id).not.toBe(entityB2.Id);
         const updates = Promise.all([
-            new Promise(resolve => this.doc1.on('update', () => {
+            new Promise<void>(resolve => this.doc1.on('update', () => {
                 resolve();
                 console.log('update doc 1', this.doc1.Entities.Items.length);
             })),
-            new Promise(resolve => this.doc2.on('update', () => {
+            new Promise<void>(resolve => this.doc2.on('update', () => {
                 resolve();
                 console.log('update doc 2', this.doc1.Entities.Items.length);
             })),

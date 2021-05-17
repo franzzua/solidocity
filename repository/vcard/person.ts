@@ -1,5 +1,5 @@
 import {entity, entitySet, field} from "../helpers/decorators";
-import {ldp, schema, space, vcard} from "rdf-namespaces";
+import {acl, ldp, schema, space, vcard} from "rdf-namespaces";
 import {Entity} from "../entity";
 import {Reference} from "../../contracts";
 import {EntitySet} from "../entity-set";
@@ -22,6 +22,6 @@ export class Person extends Entity {
     @field(space.storage, {type: "ref"})
     public Storage: Reference;
 
-    @entitySet(TrustedApp)
+    @entitySet(TrustedApp, {predicate: 'http://www.w3.org/ns/auth/acl#trustedApp'})
     public TrustedApps: EntitySet<TrustedApp>;
 }

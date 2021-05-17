@@ -11,8 +11,8 @@ import {resolve} from "path";
 import * as fs from "fs/promises";
 
 //const path = resolve(__dirname, '../../dist/test-pod');
-export const POD = 'http://localhost:3000';//`file://${path}`;
-// export const POD = 'https://fransua.solidcommunity.net';//`file://${path}`;
+// export const POD = 'http://localhost:3000';//`file://${path}`;
+export const POD = 'https://fransua.solidcommunity.net';//`file://${path}`;
 
 const home =  process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 

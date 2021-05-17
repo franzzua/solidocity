@@ -3,7 +3,7 @@ import {BaseDocument} from "./base.document";
 import {TripleSubject} from "tripledoc";
 import {Metadata} from "./helpers/metadata";
 import {Reference} from "../contracts";
-import {RdfSubject} from "../rdf/RdfDocument";
+import {RdfSubject} from "../rdf/RdfSubject";
 
 export class EntitySet<TEntity extends Entity> {
     constructor(protected document: BaseDocument,
@@ -16,8 +16,8 @@ export class EntitySet<TEntity extends Entity> {
     }
 
 
-    public Add(id = undefined) {
-        const subject = this.document.rdfDoc.addSubject(id);
+    public Add(uri = undefined) {
+        const subject = this.document.rdfDoc.addSubject(uri);
         const newItem = new this.itemConstructor(subject, this.document);
         this.items.set(newItem.Id, newItem);
         this._added.push(newItem);
@@ -68,7 +68,7 @@ export class EntitySet<TEntity extends Entity> {
     }
 
     public get(id: Reference): TEntity {
-        return this.items.get(id);
+        return this.items.get(id) ?? this._added.find(x => x.Id == id);
     }
 }
 
@@ -102,7 +102,7 @@ export class FieldEntitySet<TEntity extends Entity> extends EntitySet<TEntity> {
     /** @internal */
     Load(subjects: ReadonlyArray<RdfSubject>) {
         const info = Metadata.Entities.get(this.itemConstructor);
-        const refs = this.subj.getValues(info.TypeReference, "ref") as Reference[];
+        const refs = this.subj.getValues(info.TypeReference, "ref");
         const docSubjects = refs.map(ref => this.document.rdfDoc.getSubject(ref));
         this.docSet.Load(docSubjects);
         super.Load(subjects);

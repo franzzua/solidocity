@@ -8,7 +8,7 @@ export class Document extends BaseDocument {
 
     public async Init(...types: Constructor[]) {
         await super.Init();
-        this.Acl = new AclDocument(this.rdfDoc.getAclRef(), this);
+        this.Acl = new AclDocument(this.rdfDoc.getAclRef(), this.URI);
         // await this.Acl.Init();
     }
 
@@ -38,7 +38,7 @@ export class ItemsDocument<TEntity extends Entity> extends Document {
 
     private async LoadItems(type: Constructor) {
         const info = Metadata.Entities.get(type);
-        const subjects = this.rdfDoc.getSubjects(info.TypeReference);
+        const subjects = this.rdfDoc.getSubjectsOfType(info.TypeReference);
         this.Items = subjects.map(x => new type(x, this));
     }
 

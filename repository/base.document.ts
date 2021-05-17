@@ -49,7 +49,7 @@ export abstract class BaseDocument {
         if (info.isArray) {
             (this[info.field] as EntitySet<any>).Preload();
         }
-        const subjects = this.rdfDoc.getSubjects(entityInfo.TypeReference);
+        const subjects = this.rdfDoc.getSubjectsOfType(entityInfo.TypeReference);
         if (info.isArray) {
             (this[info.field] as EntitySet<any>).Load(subjects ?? []);
         } else {
@@ -105,7 +105,7 @@ export abstract class BaseDocument {
     public async Subscribe(uri: Reference = this.URI, cb?: () => void) {
         const ws = await this.GetWebSocket();
         ws.send(`sub ${uri}`);
-        await new Promise(resolve => {
+        await new Promise<void>(resolve => {
             ws.addEventListener('message', async message => {
                 if (!message.data.match(/(ack|pub) (.*)/)){
                     return;

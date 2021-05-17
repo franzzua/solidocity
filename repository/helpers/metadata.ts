@@ -49,6 +49,7 @@ export class Metadata {
 }
 
 export interface IFieldInfo {
+    id?: string;
     field?: string;
     Constructor?: Constructor;
     predicate?: Reference;

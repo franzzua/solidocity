@@ -57,8 +57,8 @@ export class Collection extends Document {
         this.Documents = [];
         const infos = Metadata.DocumentSets.get(this.constructor);
         for (let info of infos) {
-            const subject = this.doc.getSubject(`${this.URI}#${info.Field.toString()}`);
-            const refs = subject.getAllRefs(contains);
+            const subject = this.rdfDoc.getSubject(`${this.URI}#${info.Field.toString()}`);
+            const refs = subject.getValues(contains, "ref");
             for (let ref of refs) {
                 const doc = await (this[info.Field] as DocumentSet<any>).Load(ref);
                 this.Documents.push(doc);
@@ -68,11 +68,10 @@ export class Collection extends Document {
 
     /** @internal **/
     public async RegisterDoc(field: string | symbol, doc: Document) {
-        const subject = this.doc.getSubject(`${this.URI}#${field.toString()}`)
-            ?? this.doc.addSubject({identifier: field.toString()});
-        if (!subject.getAllRefs(contains).includes(doc.URI)) {
-            subject.addRef(contains, doc.URI);
-            await this.doc.save();
+        const subject = this.rdfDoc.getSubject(`${this.URI}#${field.toString()}`)
+        if (!subject.getValues(contains, "ref").includes(doc.URI)) {
+            subject.addValue(contains,"ref", doc.URI);
+            await this.rdfDoc.Save();
         }
         this.Documents.push(doc);
     }

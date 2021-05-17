@@ -15,9 +15,9 @@ export class AcrDocument extends BaseDocument{
 
 export class AccessControlStatement extends Entity {
 
-    public GetPolicies(applying: AccessPolicyApplying): Array<Reference>{
+    public GetPolicies(applying: AccessPolicyApplying): ReadonlyArray<Reference>{
         const applyingPredicate = this.getApplyingType(applying);
-        return this.Subject.getValues(applyingPredicate, "ref") as Reference[];
+        return this.Subject.getValues(applyingPredicate, "ref");
     }
 
     public ApplyPolicy(policy: AccessPolicy, applying: AccessPolicyApplying){

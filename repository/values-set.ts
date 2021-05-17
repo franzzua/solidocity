@@ -1,7 +1,7 @@
 import {IFieldInfo} from "./helpers/metadata";
 import {Permutation} from "../core/permutation";
-import {RdfSubject, RdfValueType, RdfValueTypeName} from "../rdf/RdfDocument";
 import {Reference} from "../contracts";
+import {RdfSubject, RdfValueType, RdfValueTypeName} from "../rdf/RdfSubject";
 
 export class ValuesSet<T extends RdfValueType> {
 
@@ -17,7 +17,7 @@ export class ValuesSet<T extends RdfValueType> {
     protected Load(){
         // const subject = this.document.doc.getSubject(this.Id);
         this.values = this.subject.getValues(this.predicate, this.type) as T[];
-        const ordering = this.subject.getValue(`${this.predicate}-order`, "string") as string;
+        const ordering = this.subject.getValue(`${this.predicate}-order`, "string");
         if (ordering != null){
             this.permutation = Permutation.Parse(ordering);
         }

@@ -11,7 +11,7 @@ describe('solid repository', () => {
 
     beforeAll(async () => {
         session = await getSession();
-        testDoc = new TestEntityDocument(`${POD}/test.ttl`);
+        testDoc = new TestEntityDocument(`${POD}/private/test.ttl`);
         await testDoc.Init();
     }, 20000);
 
@@ -23,10 +23,9 @@ describe('solid repository', () => {
         entity.Save();
         entity = testDoc.Entities.get(`${testDoc.URI}#1`);
         entity.Content = '2';
-        const promise = entity.Document.Save()
+        await entity.Document.Save()
         entity = testDoc.Entities.get(`${testDoc.URI}#1`);
         entity.Content = '3';
-        await promise;
         entity = testDoc.Entities.get(`${testDoc.URI}#1`);
         entity.Children.Push(1, 2, 3);
         entity.Children.Reorder(2,1);
