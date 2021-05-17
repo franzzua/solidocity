@@ -1,8 +1,9 @@
 import {Entity, EntityConstructor} from "./entity";
 import {BaseDocument} from "./base.document";
 import {TripleSubject} from "tripledoc";
-import {Metadata} from "./metadata";
+import {Metadata} from "./helpers/metadata";
 import {Reference} from "../contracts";
+import {RdfSubject} from "../rdf/RdfDocument";
 
 export class EntitySet<TEntity extends Entity> {
     constructor(protected document: BaseDocument,
@@ -16,10 +17,8 @@ export class EntitySet<TEntity extends Entity> {
 
 
     public Add(id = undefined) {
-        const subject = this.document.doc.addSubject({
-            identifier: id?.split('#').pop()
-        });
-        const newItem = new this.itemConstructor(subject.asRef(), this.document);
+        const subject = this.document.rdfDoc.addSubject(id);
+        const newItem = new this.itemConstructor(subject, this.document);
         this.items.set(newItem.Id, newItem);
         this._added.push(newItem);
         return newItem;
@@ -34,36 +33,26 @@ export class EntitySet<TEntity extends Entity> {
 
     Save(){
         for (let entity of this._added) {
-            if (!entity.Subject) {
-                const [prefix, id] = entity.Id.split('#');
-                const subject = this.document.doc.addSubject({
-                    identifier: id,
-                    identifierPrefix: prefix
-                });
-            }
             entity.Save();
-            // console.log('add', entity.Subject.getRef(rdf.type));
         }
         for (let entity of this._removed){
-            if (entity.Subject) {
-                entity.Remove();
-            }
+            entity.Remove();
         }
     }
 
     /** @internal */
-    Load(subjects: TripleSubject[]) {
+    Load(subjects: ReadonlyArray<RdfSubject>) {
         const entries: [Reference, TEntity][] =[
             ...subjects
                 // .filter(x => !this._removed.includes(x.asRef()))
                 .map(x => {
-                    const item = this.items.get(x.asRef()) ?? this._added.find(a => a.Id == x.asRef());
+                    const item = this.items.get(x.URI) ?? this._added.find(a => a.Id == x.URI);
                     if (item) {
                         // item.Load();
                         return item;
                     }
                     // console.log('new item', x.asRef());
-                    return new this.itemConstructor(x.asRef(), this.document)
+                    return new this.itemConstructor(x, this.document)
                 })
                 .map(x => [x.Id, x] as [Reference, TEntity]),
             // ...this._added
@@ -88,7 +77,8 @@ export class FieldEntitySet<TEntity extends Entity> extends EntitySet<TEntity> {
     private docSet: EntitySet<TEntity>;
 
     /** @internal **/
-    constructor(document: BaseDocument, itemConstructor: EntityConstructor<TEntity>, private subj: TripleSubject) {
+    constructor(document: BaseDocument, itemConstructor: EntityConstructor<TEntity>,
+                private subj: RdfSubject) {
         super(document, itemConstructor);
         this.docSet = new EntitySet(document, itemConstructor);
     }
@@ -105,15 +95,15 @@ export class FieldEntitySet<TEntity extends Entity> extends EntitySet<TEntity> {
     public Add(id = undefined) {
         const result = super.Add(id);
         const info = Metadata.Entities.get(this.itemConstructor);
-        this.subj.addRef(info.TypeReference, result.Id);
+        this.subj.addValue(info.TypeReference, "ref", result.Id);
         return result;
     }
 
     /** @internal */
-    Load(subjects: TripleSubject[]) {
+    Load(subjects: ReadonlyArray<RdfSubject>) {
         const info = Metadata.Entities.get(this.itemConstructor);
-        const refs = this.subj.getAllRefs(info.TypeReference);
-        const docSubjects = refs.map(ref => this.document.doc.getSubject(ref));
+        const refs = this.subj.getValues(info.TypeReference, "ref") as Reference[];
+        const docSubjects = refs.map(ref => this.document.rdfDoc.getSubject(ref));
         this.docSet.Load(docSubjects);
         super.Load(subjects);
     }

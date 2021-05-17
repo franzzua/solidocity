@@ -1,7 +1,7 @@
 import {Document} from "./document";
-import {Metadata} from "./metadata";
+import {Metadata} from "./helpers/metadata";
 import {Entity} from "./entity";
-import {document, entity, entitySet, field} from "./decorators";
+import {document, entity, entitySet, field} from "./helpers/decorators";
 import {ldp, rdfs, schema} from "rdf-namespaces";
 import {Reference} from "../contracts";
 import {DocumentSet} from "./document-set";

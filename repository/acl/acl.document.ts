@@ -1,16 +1,17 @@
-import {document, entitySet} from "../decorators";
+import {document, entitySet} from "../helpers/decorators";
 import {acl, foaf} from "rdf-namespaces";
 import {BaseDocument} from "../base.document";
 import {BareTripleDocument, createDocument, TripleDocument} from "tripledoc";
 import {EntitySet} from "../entity-set";
 import {Reference} from "../../contracts";
 import {AclAuthorization} from "./aclAuthorization";
+import {RdfDocument} from "../../rdf/RdfDocument";
 
 @document(acl.Authorization)
 export class AclDocument extends BaseDocument{
 
     constructor(baseURI: Reference, private owner: BaseDocument) {
-        super(baseURI);
+        super(baseURI, false);
     }
 
 
@@ -21,27 +22,24 @@ export class AclDocument extends BaseDocument{
 
     public async Init() {
         await super.Init();
-        if (!this.doc)
-             return ;
     }
 
     async InitACL(owner: Reference, ...rights: Reference[]) {
-        this.doc = createDocument(this.URI) as TripleDocument;
-        await this.InitRules(this.doc, owner, rights);
-        this.doc = await this.doc.save();
+        await this.rdfDoc.CreateDocument();
+        await this.InitRules(this.rdfDoc, owner, rights);
         await this.Init();
     }
 
     /** @internal **/
-    protected async InitRules(doc: BareTripleDocument, owner: Reference, rights: Reference[]){
-        const mySubject = doc.addSubject({identifier: `owner`});
-        const myAuth = new AclAuthorization(mySubject.asRef(), this, mySubject);
+    protected async InitRules(doc: RdfDocument, owner: Reference, rights: Reference[]){
+        const mySubject = doc.addSubject(`${doc.URI}#owner`);
+        const myAuth = new AclAuthorization(mySubject, this);
         myAuth.AccessTo = this.owner.URI;
         myAuth.Agents = [            owner        ]
         myAuth.Modes = [acl.Read, acl.Write, acl.Control];
         myAuth.Save();
-        const otherSubject = doc.addSubject({identifier: `other`});
-        const otherAuth = new AclAuthorization(otherSubject.asRef(), this, otherSubject);
+        const otherSubject = doc.addSubject(`${doc.URI}#other`);
+        const otherAuth = new AclAuthorization(otherSubject, this);
         otherAuth.AccessTo = this.owner.URI;
         otherAuth.Default = this.owner.URI;
         otherAuth.AgentClass = foaf.Agent;
@@ -50,7 +48,7 @@ export class AclDocument extends BaseDocument{
 
     }
 
-    @entitySet(AclAuthorization, {isArray: true})
+    @entitySet(AclAuthorization)
     public Rules: EntitySet<AclAuthorization>;
 
 }

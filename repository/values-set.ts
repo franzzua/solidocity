@@ -1,27 +1,27 @@
-import {IFieldInfo} from "./metadata";
+import {IFieldInfo} from "./helpers/metadata";
 import {Permutation} from "../core/permutation";
-import {TripleSubject} from "tripledoc";
+import {RdfSubject, RdfValueType, RdfValueTypeName} from "../rdf/RdfDocument";
 import {Reference} from "../contracts";
-import { BaseDocument } from "./base.document";
-import {addSubjectValue, getSubjectValues, removeSubjectValue} from "./subject.ext";
 
-export class ValuesSet<T extends string | Date | number> {
+export class ValuesSet<T extends RdfValueType> {
 
     private values: T[];
     private IsRemoved: boolean;
 
-    constructor(private document: BaseDocument, private Id: Reference, private info: IFieldInfo){
+
+
+    constructor(private subject: RdfSubject, private predicate: Reference, private type: RdfValueTypeName){
         this.Load();
     }
 
     protected Load(){
-        const subject = this.document.doc.getSubject(this.Id);
-        this.values = getSubjectValues(subject, this.info) as T[];
-        const ordering = subject.getString(`${this.info.predicate}-order`);
+        // const subject = this.document.doc.getSubject(this.Id);
+        this.values = this.subject.getValues(this.predicate, this.type) as T[];
+        const ordering = this.subject.getValue(`${this.predicate}-order`, "string") as string;
         if (ordering != null){
             this.permutation = Permutation.Parse(ordering);
         }
-        this.Items = this.permutation.Invoke(this.values);;
+        this.Items = this.permutation.Invoke(this.values);
     }
 
     //private values = getSubjectValues(this.subject, this.info);
@@ -31,8 +31,8 @@ export class ValuesSet<T extends string | Date | number> {
 
     public Save(){
         if (this.IsRemoved){
-            const subject = this.document.doc.getSubject(this.Id);
-            subject.removeAll(`${this.info.predicate}-order`);
+            this.subject.removeAllValues(`${this.predicate}-order`);
+            this.subject.removeAllValues(this.predicate);
             return;
         }
         const added = this.Items.filter(x => !this.values.includes(x));
@@ -45,14 +45,12 @@ export class ValuesSet<T extends string | Date | number> {
         }
         this.values.sort();
         this.permutation = Permutation.Diff(this.values, this.Items);
-        const subject = this.document.doc.getSubject(this.Id);
-        subject.removeAll(`${this.info.predicate}-order`);
-        subject.setString(`${this.info.predicate}-order`, this.permutation.toString());
+        this.subject.setValue(`${this.predicate}-order`, "string",this.permutation.toString());
         for (let x of deleted){
-            removeSubjectValue(subject, this.info, x);
+            this.subject.removeValue(this.predicate, this.type, x);
         }
         for (let x of added){
-            addSubjectValue(subject, this.info, x);
+            this.subject.addValue(this.predicate, this.type, x);
         }
     }
 

@@ -1,4 +1,4 @@
-import {entity, field} from "../decorators";
+import {entity, field} from "../helpers/decorators";
 import {Entity} from "../entity";
 import {acl} from "rdf-namespaces";
 import {Reference} from "../../contracts";

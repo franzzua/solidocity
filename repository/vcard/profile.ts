@@ -1,22 +1,20 @@
 import {Document} from "../document";
 import {acl, schema} from "rdf-namespaces";
-import {document, entitySet} from "../decorators";
+import {document, entity, entityField, entitySet} from "../helpers/decorators";
 import {EntitySet} from "../entity-set";
 import {Person} from "./person";
 import {Card} from "./card";
 import {TrustedApp} from "./trustedApp";
 
-
-
 @document(schema.ProfilePage)
 export class Profile extends Document {
 
-    @entitySet(Card)
+    @entityField(Card)
     public Card: Card;
 
-    @entitySet(Person)
+    @entityField(Person)
     public Me: Person;
 
-    @entitySet(TrustedApp, {isArray: true})
+    @entitySet(TrustedApp)
     public TrustedApps: EntitySet<TrustedApp>;
 }

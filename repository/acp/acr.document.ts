@@ -17,17 +17,17 @@ export class AccessControlStatement extends Entity {
 
     public GetPolicies(applying: AccessPolicyApplying): Array<Reference>{
         const applyingPredicate = this.getApplyingType(applying);
-        return this.Subject.getAllRefs(applyingPredicate);
+        return this.Subject.getValues(applyingPredicate, "ref") as Reference[];
     }
 
     public ApplyPolicy(policy: AccessPolicy, applying: AccessPolicyApplying){
         const applyingPredicate = this.getApplyingType(applying);
-        this.Subject.addRef(applyingPredicate, policy.Id);
+        this.Subject.addValue(applyingPredicate,"ref", policy.Id);
     }
 
     public RemovePolicy(policy: AccessPolicy, applying: AccessPolicyApplying){
         const applyingPredicate = this.getApplyingType(applying);
-        this.Subject.removeRef(applyingPredicate, policy.Id);
+        this.Subject.removeValue(applyingPredicate, "ref", policy.Id);
     }
 
     protected  getApplyingType(applying: AccessPolicyApplying){

@@ -15,7 +15,6 @@
     "test": "jest"
   },
   "keywords": [],
-
   "author": "",
   "license": "ISC",
   "description": "",
@@ -33,7 +32,8 @@
   "dependencies": {
     "rdf-namespaces": "latest",
     "solid-node-client": "^2.0.4",
-    "symbol-observable": "latest"
+    "symbol-observable": "latest",
+    "ulid": "^2.3.0"
   },
   "devDependencies": {
     "@hypertype/tools": "latest",

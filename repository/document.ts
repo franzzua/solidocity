@@ -1,27 +1,26 @@
 import {AclDocument} from "./acl/acl.document";
-import {Constructor, Metadata} from "./metadata";
+import {Constructor, Metadata} from "./helpers/metadata";
 import {Entity, EntityConstructor} from "./entity";
 import {BaseDocument} from "./base.document";
-import {createDocument, TripleDocument} from "tripledoc";
 import {Reference} from "../contracts";
 
 export class Document extends BaseDocument {
 
     public async Init(...types: Constructor[]) {
         await super.Init();
-        this.Acl = new AclDocument(this.doc.getAclRef(), this);
+        this.Acl = new AclDocument(this.rdfDoc.getAclRef(), this);
         // await this.Acl.Init();
     }
 
     public Acl: AclDocument;
-
-    /** @internal **/
-    protected async CreateDocument(): Promise<TripleDocument> {
-        //await fs.createFolder(this.URI.split('/').slice(0, -1).join('/'));
-        const doc = await createDocument(this.URI);
-        return await doc.save();
-    }
-
+    //
+    // /** @internal **/
+    // protected async CreateDocument(): Promise<TripleDocument> {
+    //     //await fs.createFolder(this.URI.split('/').slice(0, -1).join('/'));
+    //     const doc = await createDocument(this.URI);
+    //     return await doc.save();
+    // }
+    //
 
 
 }
@@ -39,22 +38,19 @@ export class ItemsDocument<TEntity extends Entity> extends Document {
 
     private async LoadItems(type: Constructor) {
         const info = Metadata.Entities.get(type);
-        const subjects = this.doc.getAllSubjectsOfType(info.TypeReference);
+        const subjects = this.rdfDoc.getSubjects(info.TypeReference);
         this.Items = subjects.map(x => new type(x, this));
     }
 
 
-    public Acl: AclDocument;
-
     public Items: TEntity[];
 
     public async Create(item: Omit<TEntity, keyof Entity>): Promise<TEntity> {
-        const subject = this.doc.addSubject();
-        const newItem = new this.type(subject.asRef(), this) as TEntity;
+        const subject = this.rdfDoc.addSubject();
+        const newItem = new this.type(subject, this) as TEntity;
         Object.assign(newItem, item);
         newItem.Save();
-        await this.doc.save();
-        newItem.Id = subject.asRef();
+        await this.rdfDoc.Save();
         return newItem;
     }
 }

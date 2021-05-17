@@ -1,4 +1,4 @@
-export * from './decorators';
+export * from './helpers/decorators';
 export * from './values-set';
 export * from './entity';
 export * from './entity-set';

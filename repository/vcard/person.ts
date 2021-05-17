@@ -1,4 +1,4 @@
-import {entity, entitySet, field} from "../decorators";
+import {entity, entitySet, field} from "../helpers/decorators";
 import {ldp, schema, space, vcard} from "rdf-namespaces";
 import {Entity} from "../entity";
 import {Reference} from "../../contracts";
@@ -22,6 +22,6 @@ export class Person extends Entity {
     @field(space.storage, {type: "ref"})
     public Storage: Reference;
 
-    @entitySet(TrustedApp, {isArray: true})
+    @entitySet(TrustedApp)
     public TrustedApps: EntitySet<TrustedApp>;
 }

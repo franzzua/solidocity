@@ -1,4 +1,4 @@
-import {entity, field} from "../decorators";
+import {entity, field} from "../helpers/decorators";
 import {vcard} from "rdf-namespaces";
 import {Entity} from "../entity";
 

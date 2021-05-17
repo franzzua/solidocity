@@ -1,5 +1,5 @@
-import '../core/orderBy';
-import {Reference} from "../contracts";
+import '../../core/orderBy';
+import {Reference} from "../../contracts";
 
 export type Constructor = any;
 

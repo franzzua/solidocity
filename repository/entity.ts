@@ -2,21 +2,14 @@ import {ItemsDocument} from "./document";
 import {
     IFieldInfo,
     Metadata
-} from "./metadata";
+} from "./helpers/metadata";
 import {ValuesSet} from "./values-set";
 import {BaseDocument} from "./base.document";
 import {TripleSubject} from "tripledoc";
-import {Reference} from "../contracts";
 import {rdf} from "rdf-namespaces";
-import {EntitySet, FieldEntitySet} from "./entity-set";
-import {
-    addSubjectValue,
-    getSubjectValue,
-    getSubjectValues,
-    merge,
-    removeSubjectValue,
-    setSubjectValue
-} from "./subject.ext";
+import {RdfSubject} from "../rdf/RdfDocument";
+import {FieldEntitySet} from "./entity-set";
+import {Reference} from "../contracts";
 
 /** @internal **/
 class SubjectReader {
@@ -30,9 +23,11 @@ class SubjectReader {
 export class Entity {
     public Deleted: boolean;
 
+    public get Id() {return this.Subject.URI}
+
     /** @internal **/
     constructor(
-        public Id: Reference,
+        protected Subject: RdfSubject,
         document: BaseDocument,
         /** @internal **/
         private localSubject?: TripleSubject
@@ -42,9 +37,9 @@ export class Entity {
     }
 
     /** @internal **/
-    public get Subject () {
-       return this.localSubject ?? this.Document.doc.getSubject(this.Id);
-    }
+    // public get Subject () {
+    //    return this.localSubject ?? this.Document.doc.getSubject(this.Id);
+    // }
 
     public Load() {
         const fieldInfos = Metadata.Fields.get(this.constructor);
@@ -52,21 +47,23 @@ export class Entity {
 
             if (info.type == "object"){
                 if (info.isArray){
-                    const subjects = this.Subject.getAllLocalSubjects(info.predicate);
+                    const refs = this.Subject.getValues(info.predicate, "ref") as Reference[];
+                    const subjects = refs.map(ref => this.Document.rdfDoc.getSubject(ref));
                     const set = new FieldEntitySet(this.Document, info.Constructor, this.Subject);
                     set.Load(subjects);
                     this[info.field] = set;
                 }else{
-                    const subj = this.Subject.getLocalSubject(info.predicate);
+                    const ref = this.Subject.getValue(info.predicate, "ref") as Reference;
+                    const subj = this.Document.rdfDoc.getSubject(ref);
                     this[info.field] = new info.Constructor(subj, this.Document);
                 }
-            }else {
+            }else            {
                 if (info.isArray && info.isOrdered) {
-                    this[info.field] = new ValuesSet(this.Document, this.Id, info);
+                    this[info.field] = new ValuesSet(this.Subject, info.predicate, info.type);
                 } else if (info.isArray) {
-                    this[info.field] = getSubjectValues(this.Subject, info);
+                    this[info.field] = this.Subject.getValues(info.predicate, info.type)
                 } else {
-                    this[info.field] = getSubjectValue(this.Subject, info);
+                    this[info.field] = this.Subject.getValue(info.predicate, info.type);
                 }
             }
         }
@@ -79,39 +76,30 @@ export class Entity {
                 if (info.isArray && info.isOrdered) {
                     (this[info.field] as ValuesSet<any>).Delete()
                 }
-                this.Subject.removeAll(info.predicate);
+                // this.Subject.removeAll(info.predicate);
             }
-            this.Subject.removeAll(rdf.type);
-            this.Document.doc.removeSubject(this.Id);
+            // this.Subject.removeAll(rdf.type);
+            // this.Document.doc.removeSubject(this.Id);
+            this.Subject.remove()
             return;
         }
         for (const info of fieldInfos) {
             const key = info.field;
+            if (info.type == "object") {
+                // could not process objects in entity yet
+                continue;
+            }
             if (info.isArray && info.isOrdered) {
                 (this[info.field] as ValuesSet<any>).Save();
             } else if (info.isArray) {
-                const values = getSubjectValues(this.Subject, info);
-                const newItems = this[key];
-                if (!newItems || !newItems.length) {
-                    this.Subject.removeAll(info.predicate);
-                } else {
-                    merge(newItems.orderBy(x => x), values,
-                        newValue => addSubjectValue(this.Subject, info, newValue),
-                        updValue => setSubjectValue(this.Subject, info, updValue),
-                        newValue => removeSubjectValue(this.Subject, info, newValue),
-                    );
-                }
+                this.Subject.setValues(info.predicate, info.type, this[key]);
             } else {
-                const value = getSubjectValue(this.Subject, info);
-                if (!info.equal(value, this[key])){
-                    this.Subject.removeAll(info.predicate);
-                    setSubjectValue(this.Subject, info, this[key]);
-                }
+                    this.Subject.setValue(info.predicate, info.type, this[key]);
             }
         }
         const currentType = Metadata.Entities.get(this.constructor).TypeReference;
-        if (this.Subject.getRef(rdf.type) != currentType)
-            this.Subject.setRef(rdf.type, currentType);
+        if (this.Subject.getValue(rdf.type, "ref") != currentType)
+            this.Subject.setValue(rdf.type, "ref", currentType);
     }
 
     public Assign(data: Omit<this, keyof Entity>) {

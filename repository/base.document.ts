@@ -1,14 +1,18 @@
-import {IFieldInfo, Metadata} from "./metadata";
+import {IFieldInfo, Metadata} from "./helpers/metadata";
 import {EntitySet} from "./entity-set";
-import {fetchDocument, TripleDocument} from "tripledoc";
 import {Reference} from "../contracts";
 import { authFetch } from "../impl/auth";
+import {RdfDocument} from "../rdf/RdfDocument";
 
 export abstract class BaseDocument {
     /** @internal **/
-    public doc: TripleDocument;
+    // public doc: TripleDocument;
 
-    constructor(public URI: Reference) {
+    public rdfDoc = new RdfDocument(this.URI, {
+        createIfNotExists: this.createInNotExists
+    });
+
+    constructor(public URI: Reference, private createInNotExists = true) {
 
     }
 
@@ -27,18 +31,8 @@ export abstract class BaseDocument {
     public Loading = Promise.resolve();
 
     public async Reload() {
-        await this.Loading;
-        await (this.Loading = new Promise<void>(async resolve => {
-            try {
-                this.doc = await fetchDocument(this.URI);
-            } catch (e) {
-                this.doc = await this.CreateDocument();
-            }
-            if (!this.doc)
-                return;
-            this.loadFields();
-            resolve();
-        }));
+        await this.rdfDoc.Load();
+        this.loadFields();
     }
 
     protected loadFields(){
@@ -55,25 +49,19 @@ export abstract class BaseDocument {
         if (info.isArray) {
             (this[info.field] as EntitySet<any>).Preload();
         }
-        const subjects = this.doc.getAllSubjectsOfType(entityInfo.TypeReference);
+        const subjects = this.rdfDoc.getSubjects(entityInfo.TypeReference);
         if (info.isArray) {
             (this[info.field] as EntitySet<any>).Load(subjects ?? []);
         } else {
-            this[info.field] = new info.Constructor((subjects[0] ?? this.doc.addSubject()).asRef(), this);
+            const subject = subjects[0] ?? this.rdfDoc.addSubject(entityInfo.TypeReference);
+            this[info.field] = new info.Constructor(subject, this);
         }
     }
 
-
-    /** @internal **/
-    protected abstract async CreateDocument(): Promise<TripleDocument>;
-
-
     private isSaving = false;
-    private SavePromise$ = Promise.resolve();
 
     public async Save() {
         this.isSaving = true;
-        await this.SavePromise$;
         // await this.Reload();
         this.isSaving = true;
         const fieldInfos = Metadata.Fields.get(this.constructor) ?? [];
@@ -83,19 +71,8 @@ export abstract class BaseDocument {
             }
         }
         this.loadFields();
-        await (this.SavePromise$ = new Promise<void>(async resolve => {
-            try {
-                this.doc = await this.doc.save();
-            } catch (e) {
-                if (e.status == '409') {
-                    await this.Reload();
-                    this.doc = await this.doc.save();
-                }else{
-                    throw e;
-                }
-            }
-            resolve();
-        }));
+        await this.rdfDoc.Save();
+
         this.loadFields();
         this.isSaving = false;
     }
@@ -111,20 +88,8 @@ export abstract class BaseDocument {
 
     private static _webSocketCache = new Map<Reference, Promise<WebSocket>>();
 
-    private async getWebSocketUrl(){
-        const wssUrl = this.doc.getWebSocketRef();
-        if (wssUrl != null) {
-            return wssUrl;
-        }
-        const res = await authFetch(this.URI, {method: 'HEAD'});
-        if (res.headers.has('updates-via')) {
-            return res.headers.get('updates-via');
-        }
-        throw new Error("failed to find wssUrl");
-    }
-
     private async GetWebSocket() {
-        const wssUrl = await this.getWebSocketUrl();
+        const wssUrl = await this.rdfDoc.getWebSocketRef();
         if (BaseDocument._webSocketCache.has(wssUrl)){
             return await BaseDocument._webSocketCache.get(wssUrl);
         }
