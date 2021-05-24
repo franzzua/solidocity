@@ -29,11 +29,13 @@ class OneDocsSpec {
     async world() {
         const entityA = this.doc1.Entities.Add();
         entityA.Content = 'A';
-        // entityA.Save();
+        entityA.Save();
         await this.doc1.Save();
-        // @ts-ignore
         expect(this.doc1.Entities.get(entityA.Id).Content).toEqual(entityA.Content);
-
+        entityA.Content = 'B';
+        entityA.Save();
+        await this.doc1.Save();
+        expect(this.doc1.Entities.get(entityA.Id).Content).toEqual(entityA.Content);
     }
 
     @timeout(20000)

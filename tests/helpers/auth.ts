@@ -9,41 +9,66 @@ import {ISession} from "../../contracts";
 import { SolidNodeClient } from "solid-node-client";
 import {resolve} from "path";
 import * as fs from "fs/promises";
-
+import {Session} from "@inrupt/solid-client-authn-node";
 //const path = resolve(__dirname, '../../dist/test-pod');
 // export const POD = 'http://localhost:3000';//`file://${path}`;
-export const POD = 'https://fransua.solidcommunity.net';//`file://${path}`;
+export const POD = 'https://pod.inrupt.com/fransua';//`file://${path}`;
 
 const home =  process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
-export async function getSession(): Promise<ISession> {
-    const client = new SolidNodeClient();
-    const configFile = await fs.readFile(`${home}/.solid-auth-cli-config.json`,'utf8');
-    const config = JSON.parse(configFile);
-    const result = await client.login(config);
-    if (!result.info.isLoggedIn)
-        throw new Error();
-    // client.createServerlessPod(POD);
-    // const session = (await auth.currentSession() ?? await auth.login())
-    useFetch(async function (url,options) {
-        // console.info(`${options.method ?? 'GET'}: ${url}`);
-        const res = await result.fetch(url, options);
-        // console.info(`${options.method ?? 'GET'}: ${url}`, res.status);
-// res.headers.set('Link', `<rel=${url}.acl>`);
-        // res.headers.set('Location', `${url}`);
-        return res;
+const configPath = '~/.solid-ess-auth-config.json'.replace('~', home);
+// const configPath = '~/.solid-auth-cli-config.json';
+
+let _session: Promise<ISession> = _getSession();
+export function getSession(): Promise<ISession>{
+    return _session;
+}
+
+async function _getSession(): Promise<ISession> {
+    console.log('get session');
+    const client = new SolidNodeClient({
+        handlers : { https : 'solid-client-authn-node' },
     });
-    // await useSession({
-    //     ...session,
-    //     idp: POD
-    // });
-    return {
-        ...result.info,
-        // ...session,
-        // issuer:  'http://localhost:3000',
-        // webId:  'http://localhost:3000/profile/card#me',
-        // pod: POD
-    };
+    const configFile = await fs.readFile(configPath,'utf8');
+
+    const config = JSON.parse(configFile);
+    config.debug = true;
+    try {
+        const session = new Session(
+            {
+                onNewRefreshToken: (newToken: string) => {
+                    console.log('new refresh  token', newToken);
+                    config.refreshToken = newToken;
+                    fs.writeFile(configPath, JSON.stringify(config), 'utf8')
+                },
+            },
+            "my-session"
+        );
+        const result = await session.login(config)
+        // const result = await client.login(config);
+        if (!session.info.isLoggedIn)
+            throw new Error('not authenticated');
+        // client.createServerlessPod(POD);
+        // const session = (await auth.currentSession() ?? await auth.login())
+        useFetch(async function (url, options) {
+            // console.info(`${options.method ?? 'GET'}: ${url}`);
+            const res = await session.fetch(url, options);
+            // console.info(`${options.method ?? 'GET'}: ${url}`, res.status);
+// res.headers.set('Link', `<rel=${url}.acl>`);
+            // res.headers.set('Location', `${url}`);
+            return res;
+        });
+        // await useSession({
+        //     ...session,
+        //     idp: POD
+        // });
+        return {
+            webId: session.info.webId,
+            issuer: config.oidcIssuer
+        };
+    }catch (e) {
+        throw e ?? new Error('not authenticated');
+    }
 }
 
 //

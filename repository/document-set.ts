@@ -15,7 +15,7 @@ export class DocumentSet<TDocument extends Document> {
 
     public async Load(uri: Reference) {
         if (this.documentsMap.has(uri)) {
-            await this.documentsMap.get(uri).Reload();
+            await this.documentsMap.get(uri).Init();
             return this.documentsMap.get(uri);
         }
         const document = new this.type(uri);

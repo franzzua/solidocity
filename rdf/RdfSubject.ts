@@ -1,7 +1,10 @@
 import {Reference} from "../contracts";
-import {TripleSubject} from "tripledoc";
 import {merge} from "./merge";
-import {RdfDocument} from "./RdfDocument";
+import {BlankNode, Literal, Quad_Object, Quad_Subject, Store, Term, Triple} from "n3";
+import {rdf, rdfs} from "rdf-namespaces";
+import {DataFactory} from "n3";
+import {RdfStore} from "./RdfStore";
+
 
 // export type RdfValueType = Date | string | Reference | number;
 type RdfMap = {
@@ -16,104 +19,135 @@ export type RdfValueType<T extends RdfValueTypeName = RdfValueTypeName> = RdfMap
 
 export class RdfSubject {
 
-    public get URI(): Reference {
-        return this.subject.asRef();
+    constructor(private subject: Quad_Subject,
+                private store: RdfStore) {
+        this.Type = this.triples.find(x => x.predicate.value == rdf.type)?.object?.value;
     }
 
-    constructor(private subject: TripleSubject,
-                private document: RdfDocument) {
-
+    private get triples(){
+        return this.store.triples.get(this.subject) ?? [];
     }
 
-    public getLinkedSubject(predicate: Reference) {
-        const subject = this.subject.getLocalSubject(predicate);
-    }
-    public getLinkedSubjects(predicate: Reference) {
-        const subjects = this.subject.getAllLocalSubjects(predicate);
-        return subjects.map(x => new RdfSubject(x, this.document));
+    public Type: Reference;
+    public get URI() {return this.subject.value;}
+
+    public getLinkedSubjects(predicate: Reference): ReadonlyArray<RdfSubject> {
+        return this.triples
+            .filter(x => x.predicate.value == predicate)
+            .filter(x => x.object.termType == "BlankNode")
+            .map(x => x.object as BlankNode)
+            .map(x => this.store.getSubject(x));
     }
 
+    addLinkedSubject(predicate: Reference) {
+        const blankNode = DataFactory.blankNode();
+        this.store.add([DataFactory.triple(
+            this.subject,
+            DataFactory.namedNode(predicate),
+            blankNode
+        )]);
+        const newSubject = new RdfSubject(blankNode, this.store);
+        this.store.Subjects.set(blankNode, newSubject);
+        return newSubject;
+    }
+    removeLinkedSubject(predicate: Reference, subject: RdfSubject) {
+        this.store.remove(this.triples.filter(x => x.predicate.value == predicate && x.object == subject.subject));
+    }
 
-    public getValue<T extends RdfValueTypeName>(predicate: Reference, type: T): RdfValueType<T> {
+    public setLinkedSubjects(predicate: Reference, subjects: ReadonlyArray<RdfSubject>) {
+        const existed = this.triples.filter(x => x.predicate.value == predicate);
+        const deleted = existed.filter(x => !subjects
+            .some(y => x.object.equals(y.subject)));
+        const added = subjects.filter(x => !existed.some(y => y.object.equals(x.subject)));
+        this.store.remove(deleted);
+        this.store.add(added.map(x => DataFactory.triple(
+            this.subject,
+            DataFactory.namedNode(predicate),
+            x.subject
+        )))
+    }
+
+    private convertFrom<T extends RdfValueTypeName>(value: RdfValueType<T>, type: T): Quad_Object{
+        switch (type) {
+            case "ref":
+                return DataFactory.namedNode(value as string);
+            case "string":
+                return DataFactory.literal(value as string);
+            case "decimal":
+                if (Number.isInteger(value))
+                    return DataFactory.literal(value.toString(), DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#integer'));
+                return DataFactory.literal(value.toString(), DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#decimal'));
+            case "Date":
+                return DataFactory.literal((value as Date).toISOString(), DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#dateTime'));
+        }
+    }
+    private convertTo<T extends RdfValueTypeName>(value: string, type: T): RdfValueType<T>{
         switch (type) {
             case "string":
-                return this.subject.getString(predicate) as RdfValueType<T>;
+                return value as RdfValueType<T>;
             case "Date":
-                return this.subject.getDateTime(predicate) as RdfValueType<T>;
-            case "ref":
-                return this.subject.getRef(predicate) as RdfValueType<T>;
+                return new Date(value) as RdfValueType<T>;
             case "decimal":
-                return this.subject.getDecimal(predicate) as RdfValueType<T>;
+                return +value as RdfValueType<T>;
+            case "ref":
+                return value as RdfValueType<T>;
         }
+    }
+
+    public getValue<T extends RdfValueTypeName>(predicate: Reference, type: T): RdfValueType<T> {
+        const value = this.triples.find(x => x.predicate.value == predicate);
+        if (!value)
+            return null;
+        return this.convertTo<T>(value.object.value, type);
     }
 
     public getValues<T extends RdfValueTypeName>(predicate: Reference, type: T): ReadonlyArray<RdfValueType<T>> {
-        switch (type) {
-            case "string":
-                return this.subject.getAllStrings(predicate).orderBy(x => x) as RdfValueType<T>[];
-            case "Date":
-                return this.subject.getAllDateTimes(predicate).orderBy(x => +x) as RdfValueType<T>[];
-            case "ref":
-                return this.subject.getAllRefs(predicate).orderBy(x => x) as RdfValueType<T>[];
-            case "decimal":
-                return this.subject.getAllDecimals(predicate).orderBy(x => x) as RdfValueType<T>[];
-        }
+        const values = this.triples.filter(x => x.predicate.value == predicate);
+        return values.map(value => this.convertTo<T>(value.object.value, type));
     }
 
     public removeValue<T extends RdfValueTypeName>(predicate: Reference, type: T,
-                       value: RdfValueType<T> = this.getValue(predicate, type)) {
-        switch (type) {
-            case "string":
-                return this.subject.removeString(predicate, value as string);
-            case "Date":
-                return this.subject.removeDateTime(predicate, value as Date);
-            case "ref":
-                return this.subject.removeRef(predicate, value as string);
-            case "decimal":
-                return this.subject.removeDecimal(predicate, value as number);
-        }
+                                                   value: RdfValueType<T> = this.getValue(predicate, type)) {
+        this.store.remove([this.triples.find(
+            x => x.predicate.value == predicate
+            && x.object.value == value)]);
     }
 
     public removeAllValues(predicate: Reference) {
-        return this.subject.removeAll(predicate);
+        this.store.remove(this.triples.filter(
+            x => x.predicate.value == predicate
+                ));
     }
 
     public addValue<T extends RdfValueTypeName>(predicate: Reference, type: T, value: RdfValueType<T>) {
-        switch (type) {
-            case "object":
-            case "string":
-                return this.subject.addString(predicate, value as string);
-            case "Date":
-                return this.subject.addDateTime(predicate, value as Date);
-            case "ref":
-                return this.subject.addRef(predicate, value as Reference);
-            case "decimal":
-                return this.subject.addDecimal(predicate, value as number);
-        }
+        if (value == null)
+            return;
+        this.store.add([
+            DataFactory.triple(
+                this.subject,
+                DataFactory.namedNode(predicate),
+                this.convertFrom(value, type)
+            )
+        ]);
+        if (predicate === rdf.type)
+            this.Type = value as Reference;
     }
 
     public setValue<T extends RdfValueTypeName>(predicate: Reference, type: T, value: RdfValueType<T>) {
         const oldValue = this.getValue(predicate, type);
         if (value == null && oldValue == null)
             return;
-        if (value == null && oldValue != null)
-            return this.removeValue(predicate, type, oldValue);
-        switch (type) {
-            case "string":
-                return this.subject.setString(predicate, value as string);
-            case "Date":
-                return this.subject.setDateTime(predicate, value as Date);
-            case "ref":
-                return this.subject.setRef(predicate, value as Reference);
-            case "decimal":
-                return this.subject.setDecimal(predicate, value as number);
-        }
+        if (oldValue == value)
+            return;
+        if (oldValue != null)
+            this.removeValue(predicate, type, oldValue);
+        this.addValue(predicate, type, value);
     }
 
     public setValues<T extends RdfValueTypeName>(predicate: Reference, type: T, newItems: RdfValueType<T>[]) {
         const oldValues = this.getValues<T>(predicate, type);
         if (!newItems || newItems.length == 0) {
-            this.subject.removeAll(predicate);
+            this.store.remove(this.triples.filter(x => x.predicate.value == predicate));
         } else if (oldValues.length == 0) {
             for (let newItem of newItems) {
                 this.addValue(predicate, type, newItem);
@@ -128,6 +162,7 @@ export class RdfSubject {
     }
 
     remove() {
-        this.document.removeSubject(this.URI);
+        this.store.remove(this.triples);
     }
+
 }

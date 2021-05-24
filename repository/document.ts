@@ -8,7 +8,9 @@ export class Document extends BaseDocument {
 
     public async Init(...types: Constructor[]) {
         await super.Init();
-        this.Acl = new AclDocument(this.rdfDoc.getAclRef(), this.URI);
+        const acl = this.rdfDoc.getAclRef();
+        if (acl)
+            this.Acl = new AclDocument(acl, this.URI);
         // await this.Acl.Init();
     }
 

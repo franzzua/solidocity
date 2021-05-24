@@ -30,6 +30,7 @@
     "readme.md"
   ],
   "dependencies": {
+    "@types/rdf-js": "^4.0.1",
     "rdf-namespaces": "latest",
     "solid-node-client": "^2.0.4",
     "symbol-observable": "latest",
@@ -37,16 +38,19 @@
   },
   "devDependencies": {
     "@hypertype/tools": "latest",
+    "@inrupt/generate-oidc-token": "^0.1.2",
+    "@inrupt/solid-client-authn-node": "^1.8.1",
     "@testdeck/jest": "latest",
     "@types/jest": "latest",
+    "@types/n3": "1.8.0",
     "@types/node": "latest",
     "jest": "latest",
     "jest-diff": "latest",
+    "n3": "1.10.0",
     "node-fetch": "latest",
     "solid-auth-fetcher": "^1.5.2",
     "solid-file-client": "latest",
     "solid-file-fns": "latest",
-    "tripledoc": "latest",
     "ts-jest": "latest",
     "typescript": "^4.2.4",
     "ws": "latest"

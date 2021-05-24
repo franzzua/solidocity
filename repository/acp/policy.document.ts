@@ -1,5 +1,4 @@
 import {BaseDocument} from "../base.document";
-import {TripleDocument} from "tripledoc";
 import {EntitySet} from "../entity-set";
 import {Entity} from "../entity";
 import {ValuesSet} from "../values-set";
@@ -8,7 +7,7 @@ import {AccessMode} from "./acr.document";
 
 export class PolicyDocument extends BaseDocument {
 
-    protected async CreateDocument(): Promise<TripleDocument> {
+    protected async CreateDocument(): Promise<void> {
         return null;
     }
 

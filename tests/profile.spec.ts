@@ -15,34 +15,38 @@ describe('solid profile', () => {
         session = await getSession();
         profile = new Profile(session.webId);
         await profile.Init();
-    }, 10000);
+    }, 30000);
 
 
     it('profile should have user', async () => {
         expect(profile.Me.FullName).not.toBe(null);
     }, 20000);
 
-
-    it('profile could have trusted apps', async () => {
-        console.log(profile.Me.TrustedApps.Items.map(x => x.Origin));
-    }, 20000);
-
-
     it('add localhost to trusted apps', async () => {
-        return ;
-        console.log(profile.Me.TrustedApps.Items.map(x => x.Origin));
         const newApp = await profile.Me.TrustedApps.Add();
         newApp.Origin = 'http://localhost:3200';
-        newApp.Modes = [acl.Read, acl.Write, acl.Control];
+        newApp.Modes = [acl.Read, acl.Write];
         newApp.Save();
+        profile.Me.Save();
         await profile.Save();
         await profile.Init();
         const existed = profile.Me.TrustedApps.Items.filter(x => x.Origin == newApp.Origin)
         expect(existed.length).toBeGreaterThan(0);
-        for (let trustedApp of existed) {
-            trustedApp.Remove();
-        }
-        await profile.Save();
 
     }, 20000);
+
+
+    it('remove localhost to trusted apps', async () => {
+        const existed = profile.Me.TrustedApps.Items.filter(x => x.Origin == 'http://localhost:3200');
+        for (let trustedApp of existed) {
+            profile.Me.TrustedApps.Remove(trustedApp);
+            trustedApp.Remove();
+        }
+        profile.Me.Save();
+        await profile.Save();
+        await profile.Init();
+        const existed2 = profile.Me.TrustedApps.Items.filter(x => x.Origin == 'http://localhost:3200');
+        expect(existed2.length).toBe(0);
+
+    }, 30000);
 });

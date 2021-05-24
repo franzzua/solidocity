@@ -1,3 +1,4 @@
+import "../core";
 export * from './helpers/decorators';
 export * from './values-set';
 export * from './entity';

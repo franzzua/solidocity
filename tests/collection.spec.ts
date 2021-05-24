@@ -15,7 +15,7 @@ describe('collection', ()=>{
         entity.Content = 'hi';
         entity.Save();
         await doc.Save();
-
+        await collection.Save();
         // reload it
         await collection.Init();
         expect(collection.TestEntities.Documents.length).toBe(1);

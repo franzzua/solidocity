@@ -1,12 +1,11 @@
 import {BaseDocument} from "../base.document";
-import {TripleDocument} from "tripledoc";
 import {Entity} from "../entity";
 import {EntitySet} from "../entity-set";
 import {Reference} from "../../contracts";
 import {AccessPolicy} from "./policy.document";
 
 export class AcrDocument extends BaseDocument{
-    protected async CreateDocument(): Promise<TripleDocument> {
+    protected async CreateDocument(): Promise<void> {
         return null;
     }
 

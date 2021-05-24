@@ -3,58 +3,51 @@ import {EntitySet} from "./entity-set";
 import {Reference} from "../contracts";
 import { authFetch } from "../impl/auth";
 import {RdfDocument} from "../rdf/RdfDocument";
+import {Entity} from "./entity";
 
 export abstract class BaseDocument {
     /** @internal **/
     // public doc: TripleDocument;
 
-    public rdfDoc = new RdfDocument(this.URI, {
+    public rdfDoc = new RdfDocument(this.URI.split('#')[0], {
         createIfNotExists: this.createInNotExists
     });
 
     constructor(public URI: Reference, private createInNotExists = true) {
-
+        this.URI = this.URI.split('#')[0];
+        this.InitMetadata();
     }
 
-    public async Init() {
+    private InitMetadata(){
         const fieldInfos = Metadata.Fields.get(this.constructor) ?? [];
         for (const info of fieldInfos) {
             if (info.isArray) {
                 this[info.field] = new EntitySet(this, info.Constructor);
             }
         }
-        await this.Reload();
-        //console.log(`subscribe ${this.URI}`);
-        // this.Subscribe(this.URI);
     }
 
-    public Loading = Promise.resolve();
-
-    public async Reload() {
+    public async Init() {
         await this.rdfDoc.Load();
         this.loadFields();
     }
 
     protected loadFields(){
-
         const fieldInfos = Metadata.Fields.get(this.constructor) ?? [];
         for (const info of fieldInfos) {
-            this.loadField(info);
-        }
-    }
-
-    /** @internal **/
-    protected loadField(info: IFieldInfo) {
-        const entityInfo = Metadata.Entities.get(info.Constructor);
-        if (info.isArray) {
-            (this[info.field] as EntitySet<any>).Preload();
-        }
-        const subjects = this.rdfDoc.getSubjectsOfType(entityInfo.TypeReference);
-        if (info.isArray) {
-            (this[info.field] as EntitySet<any>).Load(subjects ?? []);
-        } else {
-            const subject = subjects[0] ?? this.rdfDoc.addSubject(entityInfo.TypeReference);
-            this[info.field] = new info.Constructor(subject, this);
+            const entityInfo = Metadata.Entities.get(info.Constructor);
+            if (info.isArray) {
+                const subjects = this.rdfDoc.getSubjectsOfType(entityInfo.TypeReference);
+                (this[info.field] as EntitySet<any>).Load(subjects ?? []);
+            } else {
+                const subject = this.rdfDoc.getSubject(`${this.URI}${info.id}`)
+                if (!this[info.field]) {
+                    this[info.field] = new info.Constructor(subject, this);
+                }else{
+                    (this[info.field] as Entity).Subject = subject;
+                    (this[info.field] as Entity).Load();
+                }
+            }
         }
     }
 
@@ -64,15 +57,8 @@ export abstract class BaseDocument {
         this.isSaving = true;
         // await this.Reload();
         this.isSaving = true;
-        const fieldInfos = Metadata.Fields.get(this.constructor) ?? [];
-        for (const info of fieldInfos) {
-            if (info.isArray) {
-                (this[info.field] as EntitySet<any>).Save();
-            }
-        }
-        this.loadFields();
-        await this.rdfDoc.Save();
 
+        await this.rdfDoc.Save();
         this.loadFields();
         this.isSaving = false;
     }
@@ -118,7 +104,7 @@ export abstract class BaseDocument {
                     case "pub":
                         if (!this.isSaving) {
                             cb && cb();
-                            await this.Reload();
+                            await this.Init();
                             this.listeners.update.forEach(f => f({
                                 type: 'update',
                                 reference,

@@ -1,6 +1,3 @@
-import {TripleSubject} from "tripledoc";
-import {Reference} from "../contracts";
-import {IFieldInfo} from "../repository/helpers/metadata";
 
 export function merge<T>(from: ReadonlyArray<T>, to: ReadonlyArray<T>, onCreate: (t: T) => void, onUpdate: (t: T) => void, onDelete: (t: T) => void) {
     const minLength = Math.min(from.length, to.length);

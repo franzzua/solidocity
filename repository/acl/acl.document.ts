@@ -1,11 +1,11 @@
 import {document, entityField, entitySet} from "../helpers/decorators";
 import {acl, foaf} from "rdf-namespaces";
 import {BaseDocument} from "../base.document";
-import {BareTripleDocument, createDocument, TripleDocument} from "tripledoc";
 import {EntitySet} from "../entity-set";
 import {Reference} from "../../contracts";
 import {AclAuthorization} from "./aclAuthorization";
 import {RdfDocument} from "../../rdf/RdfDocument";
+import {authFetch} from "../../impl/auth";
 
 @document(acl.Authorization)
 export class AclDocument extends BaseDocument{
@@ -16,7 +16,7 @@ export class AclDocument extends BaseDocument{
 
 
     /** @internal **/
-    protected async CreateDocument(): Promise<TripleDocument> {
+    protected async CreateDocument(): Promise<void> {
         return null;
     }
 
@@ -24,9 +24,23 @@ export class AclDocument extends BaseDocument{
         await super.Init();
     }
 
-    async InitACL(owner: Reference, ...rights: Reference[]) {
+    async InitACL(owner: Reference) {
+        await authFetch(this.URI, {
+            method: 'PUT',
+            body: `
+@prefix acl: <http://www.w3.org/ns/auth/acl#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+<#owner>
+    a acl:Authorization;
+    acl:agent ${owner};
+    acl:accessTo <${this.ownerURI}>;
+    acl:default <${this.ownerURI}>;
+    acl:mode
+        acl:Read, acl:Write, acl:Control.
+`
+        });
         // await this.rdfDoc.CreateDocument();
-        // await this.Init();
+        await this.Init();
         // await this.InitRules(this.rdfDoc, owner, rights);
     }
 

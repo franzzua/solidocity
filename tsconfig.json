@@ -18,10 +18,13 @@
       "ES2015",
       "ESNext.Array",
       "ES2019.Array",
+      "ES2018.Regexp",
+      "ES2020.String",
       "DOM"
     ],
     "types": [
       "node",
+      "n3",
       "rdf-js",
       "symbol-observable",
       "jest"
@@ -32,6 +35,7 @@
   "exclude": [
     "dist",
     "node_modules",
+    "node_modules/@types/n3",
     "tests"
   ]
 }

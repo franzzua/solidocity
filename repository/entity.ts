@@ -5,32 +5,22 @@ import {
 } from "./helpers/metadata";
 import {ValuesSet} from "./values-set";
 import {BaseDocument} from "./base.document";
-import {TripleSubject} from "tripledoc";
 import {rdf} from "rdf-namespaces";
 import {FieldEntitySet} from "./entity-set";
 import {Reference} from "../contracts";
 import {RdfSubject} from "../rdf/RdfSubject";
 
-/** @internal **/
-class SubjectReader {
-    public static Read(subject: TripleSubject, fieldInfos: IFieldInfo[]) {
-        const result = {};
-
-        return result;
-    }
-}
-
 export class Entity {
     public Deleted: boolean;
+    Document: BaseDocument;
 
     public get Id() {return this.Subject.URI}
 
     /** @internal **/
     constructor(
-        protected Subject: RdfSubject,
-        document: BaseDocument,
         /** @internal **/
-        private localSubject?: TripleSubject
+        public Subject: RdfSubject,
+        document: BaseDocument,
     ) {
         this.Document = document;
         this.Load();
@@ -44,16 +34,14 @@ export class Entity {
     public Load() {
         const fieldInfos = Metadata.Fields.get(this.constructor);
         for (const info of fieldInfos) {
-
+            const subjects = this.Subject.getLinkedSubjects(info.predicate);
             if (info.type == "object"){
                 if (info.isArray){
-                    const subjects = this.Subject.getLinkedSubjects(info.predicate);
-                    const set = new FieldEntitySet(this.Document, info.Constructor, this.Subject);
+                    const set = new FieldEntitySet(this.Document, info.Constructor, this.Subject, info.predicate);
                     set.Load(subjects);
                     this[info.field] = set;
                 }else{
-                    const subj = this.Subject.getLinkedSubject(info.predicate);
-                    this[info.field] = new info.Constructor(subj, this.Document);
+                    this[info.field] = new info.Constructor(subjects[0] ?? this.Subject.addLinkedSubject(info.predicate), this.Document);
                 }
             }else            {
                 if (info.isArray && info.isOrdered) {
@@ -70,21 +58,17 @@ export class Entity {
     public Save() {
         const fieldInfos = Metadata.Fields.get(this.constructor);
         if (this.Deleted){
-            for (const info of fieldInfos) {
-                if (info.isArray && info.isOrdered) {
-                    (this[info.field] as ValuesSet<any>).Delete()
-                }
-                // this.Subject.removeAll(info.predicate);
-            }
-            // this.Subject.removeAll(rdf.type);
-            // this.Document.doc.removeSubject(this.Id);
             this.Subject.remove()
             return;
         }
         for (const info of fieldInfos) {
             const key = info.field;
             if (info.type == "object") {
-                // could not process objects in entity yet
+                if (info.isArray){
+                    this.Subject.setLinkedSubjects(info.predicate, (this[info.field] as FieldEntitySet<Entity>).Items.map(x => x.Subject));
+                }else{
+                    this.Subject.setLinkedSubjects(info.predicate, [(this[info.field] as Entity).Subject]);
+                }
                 continue;
             }
             if (info.isArray && info.isOrdered) {
@@ -92,7 +76,7 @@ export class Entity {
             } else if (info.isArray) {
                 this.Subject.setValues(info.predicate, info.type, this[key]);
             } else {
-                    this.Subject.setValue(info.predicate, info.type, this[key]);
+                this.Subject.setValue(info.predicate, info.type, this[key]);
             }
         }
         const currentType = Metadata.Entities.get(this.constructor).TypeReference;
@@ -100,19 +84,15 @@ export class Entity {
             this.Subject.setValue(rdf.type, "ref", currentType);
     }
 
-    public Assign(data: Omit<this, keyof Entity>) {
-
-    }
-
     public Remove() {
         this.Deleted = true;
         this.Save();
-        //const fieldInfos = Metadata.Fields.get(this.constructor);
-        //for (const info of fieldInfos) {
-        //}
     }
 
-    Document: BaseDocument;
+    public Merge(other: Omit<this, keyof Entity>){
+        Object.apply(this, other);
+    }
+
 }
 
 

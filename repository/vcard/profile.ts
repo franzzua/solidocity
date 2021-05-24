@@ -9,10 +9,10 @@ import {TrustedApp} from "./trustedApp";
 @document(schema.ProfilePage)
 export class Profile extends Document {
 
-    @entityField(Card, 'card')
+    @entityField(Card, '')
     public Card: Card;
 
-    @entityField(Person, 'me')
+    @entityField(Person, '#me')
     public Me: Person;
 
 }

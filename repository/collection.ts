@@ -37,14 +37,14 @@ export class Collection extends Document {
 
     public async Init() {
         const isExists = await authFetch(this.folderURI+'/', {method: 'HEAD'});
-        if (!isExists.ok)
-            await authFetch(this.folderURI+'/', {
-                method: 'POST',
-                headers: {
-                    link: '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"',
-                    'Content-Type': 'text/turtle'
-                }
-            });
+        // if (!isExists.ok)
+        //     await authFetch(this.folderURI+'/', {
+        //         method: 'POST',
+        //         headers: {
+        //             link: '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"',
+        //             'Content-Type': 'text/turtle'
+        //         }
+        //     });
         const infos = Metadata.DocumentSets.get(this.constructor);
         for (let info of infos) {
             this[info.Field] = new DocumentSet(info.Constructor, this, info.Field)

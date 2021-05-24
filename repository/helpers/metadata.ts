@@ -11,7 +11,7 @@ export class Metadata {
     public static Collections = new Map<Constructor, ICollectionInfo>() ;
     public static DocumentSets = new Map<Constructor, IDocumentSetInfo[]>() ;
 
-    public static addDocument(target, reference: Reference,) {
+    public static addDocument(target, reference: Reference) {
         this.Documents.set(target, {
             TypeReference: reference
         })
