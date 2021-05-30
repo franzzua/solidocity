@@ -9,8 +9,8 @@
     "web:watch": "hypertype web --watch",
     "worker:watch": "hypertype worker --watch",
     "node:watch": "hypertype node --watch",
-    "bundle:prod": "hypertype node --prod",
-    "bundle:prod:stats": "hypertype node --prod --stats",
+    "bundle:prod": "hypertype web --prod",
+    "bundle:prod:stats": "hypertype web --prod --stats",
     "publish&version": "npm version patch && npm publish",
     "test": "jest"
   },
