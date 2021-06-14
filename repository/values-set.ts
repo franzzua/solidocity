@@ -1,7 +1,8 @@
 import {IFieldInfo} from "./helpers/metadata";
 import {Permutation} from "../core/permutation";
 import {Reference} from "../contracts";
-import {RdfSubject, RdfValueType, RdfValueTypeName} from "../rdf/RdfSubject";
+import {RdfSubject} from "../rdf/RdfSubject";
+import {RdfValueType, RdfValueTypeName} from "../rdf/values/rdf-object";
 
 export class ValuesSet<T extends RdfValueType> {
 
@@ -9,16 +10,15 @@ export class ValuesSet<T extends RdfValueType> {
     private IsRemoved: boolean;
 
 
-
-    constructor(private subject: RdfSubject, private predicate: Reference, private type: RdfValueTypeName){
+    constructor(private subject: RdfSubject, private predicate: Reference, private type: RdfValueTypeName) {
         this.Load();
     }
 
-    protected Load(){
+    protected Load() {
         // const subject = this.document.doc.getSubject(this.Id);
-        this.values = this.subject.getValues(this.predicate, this.type) as T[];
-        const ordering = this.subject.getValue(`${this.predicate}-order`, "string");
-        if (ordering != null){
+        this.values = this.subject.Set(this.predicate, this.type).get() as T[];
+        const ordering = this.subject.Scalar<string>(`${this.predicate}-order`, "string").get();
+        if (ordering != null) {
             this.permutation = Permutation.Parse(ordering);
         }
         this.Items = this.permutation.Invoke(this.values);
@@ -29,29 +29,24 @@ export class ValuesSet<T extends RdfValueType> {
 
     public Items: ReadonlyArray<T>;
 
-    public Save(){
-        if (this.IsRemoved){
-            this.subject.removeAllValues(`${this.predicate}-order`);
-            this.subject.removeAllValues(this.predicate);
+    public Save() {
+        if (this.IsRemoved) {
+            this.subject.Scalar<string>(`${this.predicate}-order`, "string").set(null);
+            this.subject.Set(this.predicate, this.type).set([]);
             return;
         }
         const added = this.Items.filter(x => !this.values.includes(x));
         const deleted = this.values.filter(x => !this.Items.includes(x));
-        for (let x of deleted){
+        for (let x of deleted) {
             this.values.splice(this.values.indexOf(x), 1);
         }
-        for (let x of added){
+        for (let x of added) {
             this.values.push(x);
         }
         this.values.sort();
         this.permutation = Permutation.Diff(this.values, this.Items);
-        this.subject.setValue(`${this.predicate}-order`, "string",this.permutation.toString());
-        for (let x of deleted){
-            this.subject.removeValue(this.predicate, this.type, x);
-        }
-        for (let x of added){
-            this.subject.addValue(this.predicate, this.type, x);
-        }
+        this.subject.Scalar(`${this.predicate}-order`, "string").set(this.permutation.toString());
+        this.subject.Set(this.predicate, this.type).set(this.values);
     }
 
     public Push(...values: T[]) {
@@ -64,7 +59,7 @@ export class ValuesSet<T extends RdfValueType> {
         const items = [...this.Items];
         const child = items.splice(oldIndex, 1)[0];
         items.splice(newIndex, 0, child);
-        this.Items  = items;
+        this.Items = items;
     }
 
     public Insert(child: T, index: any) {

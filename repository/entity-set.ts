@@ -25,7 +25,7 @@ export class EntitySet<TEntity extends Entity> {
 
     public Remove(entity: TEntity){
         this.items.delete(entity.Id);
-        this.document.rdfDoc.removeSubject(entity.Id);
+        entity.Subject.remove();
     }
 
     /** @internal */
@@ -71,7 +71,7 @@ export class FieldEntitySet<TEntity extends Entity> extends EntitySet<TEntity> {
 
 
     public Add(id = undefined) {
-        const subject = this.subj.addLinkedSubject(this.predicate);
+        const subject = this.subj.Link(this.predicate).add();
         const result = new this.itemConstructor(subject, this.document);
         this.items.set(result.Id, result);
         // const info = Metadata.Entities.get(this.itemConstructor);
@@ -81,7 +81,7 @@ export class FieldEntitySet<TEntity extends Entity> extends EntitySet<TEntity> {
 
     public Remove(entity: TEntity){
         this.items.delete(entity.Id);
-        this.subj.removeLinkedSubject(this.predicate, entity.Subject) ;
+        this.subj.Link(this.predicate).remove(entity.Subject) ;
     }
 
     /** @internal */

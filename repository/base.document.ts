@@ -9,11 +9,15 @@ export abstract class BaseDocument {
     /** @internal **/
     // public doc: TripleDocument;
 
-    public rdfDoc = new RdfDocument(this.URI.split('#')[0], {
-        createIfNotExists: this.createInNotExists
-    });
+    public rdfDoc = new RdfDocument(this.URI.split('#')[0], this.options);
 
-    constructor(public URI: Reference, private createInNotExists = true) {
+    constructor(public URI: Reference, private options: {
+        createInNotExists: boolean;
+        persistance: boolean;
+    } = {
+        createInNotExists: true,
+        persistance: false
+    }) {
         this.URI = this.URI.split('#')[0];
         this.InitMetadata();
     }

@@ -1,80 +1,87 @@
 import {DataFactory, Quad_Subject, Term, Triple} from "n3";
 import {RdfSubject} from "./RdfSubject";
-import {Reference} from "../contracts";
-import {returns} from "rdf-namespaces/dist/hydra";
+import {PersistanceStore} from "./persistance/persistance.store";
 
 export class RdfStore {
     constructor() {
+
     }
 
-    triples: Map<Quad_Subject, Triple[]> = new Map();
-    public Subjects: Map<Quad_Subject, RdfSubject> = new Map();
+    public readonly Subjects: RdfSubject[] = [];
 
-    merge(triples: Triple[]){
-        this.triples = triples.groupBy(x => x.subject);
-        this.Subjects = new Map(
-            [...this.triples.keys()].map(key => [key, new RdfSubject(key, this)])
-        );
+    merge(allTriples: Triple[]) {
+        const grouped = [...allTriples.groupBy(x => x.subject)];
+        for (const [subject, triples] of grouped) {
+            const existed = this.get(subject);
+            if (existed)
+                existed.merge(triples);
+            else
+                this.add(new RdfSubject(this, subject, triples));
+        }
     }
 
-    create(uri){
+    create(uri) {
         const term = DataFactory.namedNode(uri);
-        const tripleSubject = new RdfSubject(term, this);
-        this.Subjects.set(term, tripleSubject);
+        const tripleSubject = new RdfSubject(this, term, []);
+        this.Subjects.push(tripleSubject);
         return tripleSubject;
     }
 
-    add(triples: Triple[]){
-        this.changes.add.push(...triples);
-        for (let triple of triples) {
-            const ref = triple.subject;
-            if (!this.triples.has(ref))
-                this.triples.set(ref, [triple]);
-            else
-                this.triples.get(ref).push(triple);
+    get(subject: Quad_Subject): RdfSubject {
+        return this.Subjects.find(x => x.subject.equals(subject));
+    }
+
+    add(subject: RdfSubject) {
+        this.Subjects.push(subject);
+    }
+
+
+    getTriples(): Triple[] {
+        return this.Subjects.flatMap(x => x.ArSet.Values);
+    }
+
+    getChanges(): {add: Triple[], remove: Triple[]} {
+        // const changes = this.changes.getAll();
+        // this.changes = new ChangesStore();
+        const changes = this.Subjects.map(x => x.getChanges());
+
+        return {
+            add: changes.flatMap(x => x.add),
+            remove: changes.flatMap(x => x.remove),
         }
     }
 
-    remove(triples: Triple[]){
-        this.changes.delete.push(...triples);
-        for (let [subj, array] of triples.groupBy(x => x.subject)) {
-            this.triples.get(subj).remove(array, triplesComparer);
-        }
-    }
+    // private changes = new ChangesStore();
 
-    removeAll(uri: Reference) {
-        const key = [...this.triples.keys()].find(x=> x.value == uri);
-        this.changes.delete.push(...this.triples.get(key));
-        this.triples.delete(key);
-    }
-
-    getChanges() {
-        const added = [...this.changes.add];
-        this.changes.add.remove(this.changes.delete, (a,b) => a.equals(b));
-        this.changes.delete.remove(added, (a,b) => a.equals(b));
-        const changes = this.changes;
-        this.changes = {add: [], delete: []};
-        return changes;
-    }
-
-    private changes: {
-        add: Triple[];
-        delete: Triple[];
-    } = {
-        add: [],
-        delete: []
-    };
-
-    public getSubject(x: Quad_Subject): RdfSubject {
-        const equal = this.Subjects.get(x);
+    public getOrAdd(x: Quad_Subject): RdfSubject {
+        const equal = this.get(x);
         if (equal) return equal;
-        const same = [...this.Subjects].find(([key,value]) => key.equals(x));
-        if (same) return same[1];
-        return new RdfSubject(x, this);
+        const newSubject = new RdfSubject(this, x, []);
+        this.add(newSubject);
+        return  newSubject;
     }
 }
 
+// class ChangesStore {
+//     protected add: Triple[] = [];
+//     protected delete: Triple[] = [];
+//
+//     pushAdd(...triples: Triple[]) {
+//         this.add.push(...triples);
+//     }
+//
+//     pushDelete(...triples: Triple[]) {
+//         this.delete.push(...triples);
+//     }
+//
+//     getAll() {
+//         const added = [...this.add];
+//         this.add.remove(this.delete, (a, b) => a.equals(b));
+//         this.delete.remove(added, (a, b) => a.equals(b));
+//     }
+// }
+
 const triplesComparer = (a: Triple, b: Triple) =>
     a.subject.value == b.subject.value
-    &&  a.predicate.value == b.predicate.value
-    &&  a.object.value == b.object.value;
+    && a.predicate.value == b.predicate.value
+    && a.object.value == b.object.value;

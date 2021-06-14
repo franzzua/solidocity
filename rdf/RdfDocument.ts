@@ -4,17 +4,23 @@ import {authFetch} from "../impl/auth";
 import {RdfSubject} from "./RdfSubject";
 import {RdfStore} from "./RdfStore";
 import {triplesToTurtle, turtleToTriples} from "./parse";
-import {DataFactory} from "n3";
+import {PersistanceStore} from "./persistance/persistance.store";
+import {Change} from "./change";
+import {Triple} from "n3";
 
 export class RdfDocument {
     // private tripleDoc: TripleDocument;
     private headers: Headers;
+    public Store: RdfStore = new RdfStore();
+    private persistance: PersistanceStore = new PersistanceStore();
 
 
     constructor(public URI: Reference, private options: {
-        createIfNotExists: boolean
+        createInNotExists: boolean,
+        persistance: boolean
     } = {
-        createIfNotExists: true
+        createInNotExists: true,
+        persistance: false
     }) {
     }
 
@@ -27,6 +33,8 @@ export class RdfDocument {
     }
 
     private async load() {
+        await this.persistance.Load();
+        this.Store.merge(this.persistance.Triples.Values);
         const response = await authFetch(this.URI, {
 
             headers: {
@@ -38,24 +46,25 @@ export class RdfDocument {
             const turtle = await response.text();
             const triples = await turtleToTriples(turtle, this.URI);
             this.Store.merge(triples);
+            this.persistance.merge(triples);
+            // this.Store.merge(triples);
         } else {
 
         }
     }
 
 
-    public Store = new RdfStore();
+    public Subjects: RdfSubject[] = [];
 
 
     public getSubjectsOfType(type: Reference): ReadonlyArray<RdfSubject> {
-        return [...this.Store.Subjects.values()]
-            .filter(x => x.Type == type);
+        return this.Subjects.filter(x => x.Type == type);
         // return this.tripleDoc.getAllSubjectsOfType(type)
         //     .map(subject => new RdfSubject(subject, this));
     }
 
     public getSubject(uri: Reference): RdfSubject {
-        const tripleSubject = [...this.Store.Subjects.values()]
+        const tripleSubject = this.Subjects
             .find(x => x.URI == uri);
         if (!tripleSubject)
             return this.addSubject(uri);
@@ -75,36 +84,33 @@ export class RdfDocument {
         return this.Store.create(uri);
     }
 
-    removeSubject(uri: Reference) {
-        this.Store.removeAll(uri);
-    }
+    // removeSubject(uri: Reference) {
+    //     this.Store.removeAll(uri);
+    // }
 
     private SavePromise$ = Promise.resolve();
 
-    async Save() {
-        const response = await authFetch(this.URI, {method: 'HEAD'});
-        if (!response.ok){
-            const changes = this.Store.getChanges();
-            const turtle = await triplesToTurtle(changes.add);
-            const res = await authFetch(this.URI, {
-                method: 'PUT',
-                body: turtle,
-                headers: {
-                    'Content-Type': 'text/turtle',
-                    'If-None-Match': '*',
-                }
-            });
-            const text = await res.text();
-            if (!res.ok){
-                console.error(text);
+    private async create(change: Change<Triple>){
+        const turtle = await triplesToTurtle(change.add);
+        const res = await authFetch(this.URI, {
+            method: 'PUT',
+            body: turtle,
+            headers: {
+                'Content-Type': 'text/turtle',
+                'If-None-Match': '*',
             }
-        } else {
-            const changes = this.Store.getChanges();
-            const remove = await triplesToTurtle(changes.delete);
-            const deleteWhere =  remove.replace(/\_\:/g, '?');
-            const insert = await triplesToTurtle(changes.add);
+        });
+        const text = await res.text();
+        if (!res.ok){
+            console.error(text);
+        }
+    }
 
-            const body = `
+    private async update(change: Change<Triple>){
+        const remove = await triplesToTurtle(change.remove);
+        const deleteWhere =  remove.replace(/\_\:/g, '?');
+        const insert = await triplesToTurtle(change.add);
+        const body = `
             INSERT DATA {
                 ${insert}
             };
@@ -112,19 +118,30 @@ export class RdfDocument {
                 ${deleteWhere}
             };
             `;
-            try {
-                const resp = await authFetch(this.URI, {
-                    method: 'PATCH',
-                    body: body,
-                    headers: {
-                        'Content-Type': 'application/sparql-update'
-                    }
-                });
-                const text = await resp.text();
-            }catch (e) {
-                console.error(e);
-            }
+        try {
+            const resp = await authFetch(this.URI, {
+                method: 'PATCH',
+                body: body,
+                headers: {
+                    'Content-Type': 'application/sparql-update'
+                }
+            });
+            const text = await resp.text();
+        }catch (e) {
+            console.error(e);
         }
+    }
+
+    async Save() {
+        const changes = this.Store.getChanges();
+        this.persistance.save(changes);
+        const response = await authFetch(this.URI, {method: 'HEAD'});
+        if (!response.ok){
+            await this.create(changes);
+        } else {
+            await this.update(changes);
+        }
+        this.persistance.merge(this.Store.getTriples());
         // throw new Error('not implemented yet');
         // await (this.SavePromise$ = new Promise<void>(async resolve => {
         //     try {

@@ -16,17 +16,17 @@ export class AccessControlStatement extends Entity {
 
     public GetPolicies(applying: AccessPolicyApplying): ReadonlyArray<Reference>{
         const applyingPredicate = this.getApplyingType(applying);
-        return this.Subject.getValues(applyingPredicate, "ref");
+        return this.Subject.Set<Reference>(applyingPredicate, "ref").get();
     }
 
     public ApplyPolicy(policy: AccessPolicy, applying: AccessPolicyApplying){
         const applyingPredicate = this.getApplyingType(applying);
-        this.Subject.addValue(applyingPredicate,"ref", policy.Id);
+        this.Subject.Set(applyingPredicate,"ref").add(policy.Id);
     }
 
     public RemovePolicy(policy: AccessPolicy, applying: AccessPolicyApplying){
         const applyingPredicate = this.getApplyingType(applying);
-        this.Subject.removeValue(applyingPredicate, "ref", policy.Id);
+        this.Subject.Set(applyingPredicate, "ref").remove(policy.Id);
     }
 
     protected  getApplyingType(applying: AccessPolicyApplying){

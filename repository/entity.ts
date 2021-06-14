@@ -34,22 +34,23 @@ export class Entity {
     public Load() {
         const fieldInfos = Metadata.Fields.get(this.constructor);
         for (const info of fieldInfos) {
-            const subjects = this.Subject.getLinkedSubjects(info.predicate);
+            const subjects = this.Subject.Link(info.predicate).get();
             if (info.type == "object"){
                 if (info.isArray){
                     const set = new FieldEntitySet(this.Document, info.Constructor, this.Subject, info.predicate);
                     set.Load(subjects);
                     this[info.field] = set;
                 }else{
-                    this[info.field] = new info.Constructor(subjects[0] ?? this.Subject.addLinkedSubject(info.predicate), this.Document);
+                    const subject = subjects[0] ?? this.Subject.Link(info.predicate).add()
+                    this[info.field] = new info.Constructor(subject, this.Document);
                 }
             }else            {
                 if (info.isArray && info.isOrdered) {
                     this[info.field] = new ValuesSet(this.Subject, info.predicate, info.type);
                 } else if (info.isArray) {
-                    this[info.field] = this.Subject.getValues(info.predicate, info.type)
+                    this[info.field] = this.Subject.Set(info.predicate, info.type).get();
                 } else {
-                    this[info.field] = this.Subject.getValue(info.predicate, info.type);
+                    this[info.field] = this.Subject.Scalar(info.predicate, info.type).get();
                 }
             }
         }
@@ -65,23 +66,22 @@ export class Entity {
             const key = info.field;
             if (info.type == "object") {
                 if (info.isArray){
-                    this.Subject.setLinkedSubjects(info.predicate, (this[info.field] as FieldEntitySet<Entity>).Items.map(x => x.Subject));
+                    this.Subject.Link(info.predicate).set((this[info.field] as FieldEntitySet<Entity>).Items.map(x => x.Subject));
                 }else{
-                    this.Subject.setLinkedSubjects(info.predicate, [(this[info.field] as Entity).Subject]);
+                    this.Subject.Link(info.predicate).set( [(this[info.field] as Entity).Subject]);
                 }
                 continue;
             }
             if (info.isArray && info.isOrdered) {
                 (this[info.field] as ValuesSet<any>).Save();
             } else if (info.isArray) {
-                this.Subject.setValues(info.predicate, info.type, this[key]);
+                this.Subject.Set(info.predicate, info.type).set(this[key]);
             } else {
-                this.Subject.setValue(info.predicate, info.type, this[key]);
+                this.Subject.Set(info.predicate, info.type).set(this[key]);
             }
         }
         const currentType = Metadata.Entities.get(this.constructor).TypeReference;
-        if (this.Subject.getValue(rdf.type, "ref") != currentType)
-            this.Subject.setValue(rdf.type, "ref", currentType);
+        this.Subject.Scalar(rdf.type, "ref").set(currentType);
     }
 
     public Remove() {

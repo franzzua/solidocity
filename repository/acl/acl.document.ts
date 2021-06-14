@@ -11,7 +11,10 @@ import {authFetch} from "../../impl/auth";
 export class AclDocument extends BaseDocument{
 
     constructor(baseURI: Reference, private ownerURI: Reference) {
-        super(baseURI, false);
+        super(baseURI, {
+            createInNotExists: false,
+            persistance: false
+        });
     }
 
 

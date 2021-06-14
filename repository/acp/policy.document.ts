@@ -21,9 +21,9 @@ export class AccessPolicy extends Entity {
     public readonly Allow: ValuesSet<AccessMode>;
     public readonly Deny: ValuesSet<AccessMode>;
 
-    public AnyOf: ValuesSet<Reference>;
-    public SomeOf: ValuesSet<Reference>;
-    public NoneOf: ValuesSet<Reference>;
+    public AnyOf: EntitySet<AccessRule>;
+    public SomeOf: EntitySet<AccessRule>;
+    public NoneOf: EntitySet<AccessRule>;
 
 }
 
