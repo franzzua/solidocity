@@ -12,6 +12,7 @@ class OneDocsSpec {
     @timeout(20000)
     async before(){
         this.session = await getSession();
+
         this.doc1 = new TestEntityDocument(`${POD}/tests/t1.ttl`);
         try {
             await this.doc1.Remove().catch();

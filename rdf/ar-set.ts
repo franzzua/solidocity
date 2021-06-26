@@ -56,6 +56,12 @@ export class ArSet<T extends { equals(t: T): boolean; }> {
             remove: this.removed.value
         }
     }
+
+    public saveChanges(): void {
+        this.initial = this.Values;
+        this.removed.clear();
+        this.added.clear();
+    }
 }
 
 class ComparableSet<T> {
@@ -82,5 +88,9 @@ class ComparableSet<T> {
     public add(value: T): void {
         if (!this.has(value))
             this.initial.push(value);
+    }
+
+    public clear(): void {
+        this.initial = [];
     }
 }

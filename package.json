@@ -2,6 +2,8 @@
   "name": "solidocity",
   "version": "1.2.10",
   "browser": "dist/index.js",
+  "module": "dist/esm/entry/web.js",
+  "module-es6": "dist/esm/entry/web.js",
   "main": "dist/node.js",
   "typings": "dist/typings/entry/web.d.ts",
   "scripts": {
@@ -12,6 +14,7 @@
     "bundle:prod": "hypertype web --prod",
     "bundle:prod:stats": "hypertype web --prod --stats",
     "publish&version": "npm version patch && npm publish",
+    "pre-test": "node ./node_modules/@inrupt/generate-oidc-token/cli/cli.js",
     "test": "jest"
   },
   "keywords": [],
@@ -39,7 +42,7 @@
   "devDependencies": {
     "@hypertype/tools": "latest",
     "@inrupt/generate-oidc-token": "^0.1.2",
-    "@inrupt/solid-client-authn-node": "^1.8.1",
+    "@inrupt/solid-client-authn-node": "^1.9.0",
     "@testdeck/jest": "latest",
     "@types/jest": "latest",
     "@types/n3": "1.8.0",
@@ -48,7 +51,7 @@
     "jest-diff": "latest",
     "n3": "1.10.0",
     "node-fetch": "latest",
-    "solid-auth-fetcher": "^1.5.2",
+    "solid-auth-fetcher": "^1.5.3",
     "solid-file-client": "latest",
     "solid-file-fns": "latest",
     "ts-jest": "latest",

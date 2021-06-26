@@ -13,8 +13,8 @@ export class RdfSet<T extends RdfValueType> extends RdfObject<T> {
         } else if (oldValues.length == 0) {
             this.subject.replace([], newItems.map(this.toTriple));
         } else {
-            const add = [...newItems].remove(this.get());
-            const remove = this.triples.remove(newItems, (t, v) => this.toJS(t.object) === v);
+            const add = [...newItems].removeAll(this.get());
+            const remove = this.triples.removeAll(newItems, (t, v) => this.toJS(t.object) === v);
             this.subject.replace(remove, add.map(this.toTriple));
         }
     }

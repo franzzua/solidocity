@@ -60,28 +60,11 @@ export class RdfStore {
         this.add(newSubject);
         return  newSubject;
     }
+
+    public saveChanges(): void {
+        for (let subject of this.Subjects) {
+            subject.saveChanges();
+        }
+    }
 }
 
-// class ChangesStore {
-//     protected add: Triple[] = [];
-//     protected delete: Triple[] = [];
-//
-//     pushAdd(...triples: Triple[]) {
-//         this.add.push(...triples);
-//     }
-//
-//     pushDelete(...triples: Triple[]) {
-//         this.delete.push(...triples);
-//     }
-//
-//     getAll() {
-//         const added = [...this.add];
-//         this.add.remove(this.delete, (a, b) => a.equals(b));
-//         this.delete.remove(added, (a, b) => a.equals(b));
-//     }
-// }
-
-const triplesComparer = (a: Triple, b: Triple) =>
-    a.subject.value == b.subject.value
-    && a.predicate.value == b.predicate.value
-    && a.object.value == b.object.value;

@@ -1,12 +1,12 @@
 export {};
 declare global {
     interface Array<T> {
-        remove<U = T>(items: ReadonlyArray<U>, comparer?: (a: T, b: U) => boolean): T[];
+        removeAll<U = T>(items: ReadonlyArray<U>, comparer?: (a: T, b: U) => boolean): T[];
         removeIf(checker: (x: T) => boolean): void;
     }
 }
 
-Array.prototype.remove = function <T,U = T>(items: ReadonlyArray<U>, comparer: (a: T, b: U) => boolean = (a, b) => a === b as unknown as T): T[] {
+Array.prototype.removeAll = function <T,U = T>(items: ReadonlyArray<U>, comparer: (a: T, b: U) => boolean = (a, b) => a === b as unknown as T): T[] {
     let length = this.length;
     for (let index = 0; index < length; ){
         const current = this[index];

@@ -12,12 +12,13 @@ import * as fs from "fs/promises";
 import {Session} from "@inrupt/solid-client-authn-node";
 //const path = resolve(__dirname, '../../dist/test-pod');
 // export const POD = 'http://localhost:3000';//`file://${path}`;
-export const POD = 'https://pod.inrupt.com/fransua';//`file://${path}`;
+// export const POD = 'https://pod.inrupt.com/fransua';//`file://${path}`;
+export const POD = 'https://fransua.solidcommunity.com';//`file://${path}`;
 
 const home =  process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
-const configPath = '~/.solid-ess-auth-config.json'.replace('~', home);
-// const configPath = '~/.solid-auth-cli-config.json';
+// const configPath = '~/.solid-ess-auth-config.json'.replace('~', home);
+const configPath = '~/.solid-auth-cli-config.json'.replace('~', home);
 
 let _session: Promise<ISession> = _getSession();
 export function getSession(): Promise<ISession>{
@@ -25,34 +26,35 @@ export function getSession(): Promise<ISession>{
 }
 
 async function _getSession(): Promise<ISession> {
-    console.log('get session');
     const client = new SolidNodeClient({
-        handlers : { https : 'solid-client-authn-node' },
+        // handlers : { https : 'solid-client-authn-node' },
     });
     const configFile = await fs.readFile(configPath,'utf8');
 
     const config = JSON.parse(configFile);
     config.debug = true;
     try {
-        const session = new Session(
-            {
-                onNewRefreshToken: (newToken: string) => {
-                    console.log('new refresh  token', newToken);
-                    config.refreshToken = newToken;
-                    fs.writeFile(configPath, JSON.stringify(config), 'utf8')
-                },
-            },
-            "my-session"
-        );
-        const result = await session.login(config)
-        // const result = await client.login(config);
-        if (!session.info.isLoggedIn)
+        // const session = new Session(
+        //     {
+        //         onNewRefreshToken: (newToken: string) => {
+        //             console.log('new refresh  token', newToken);
+        //             config.refreshToken = newToken;
+        //             fs.writeFile(configPath, JSON.stringify(config), 'utf8')
+        //         },
+        //     },
+        //     "my-session"
+        // );
+        // const result = await session.login({
+        //     ...config,
+        // })
+        const result = await client.login(config);
+        if (!result.info.isLoggedIn)
             throw new Error('not authenticated');
         // client.createServerlessPod(POD);
         // const session = (await auth.currentSession() ?? await auth.login())
         useFetch(async function (url, options) {
             // console.info(`${options.method ?? 'GET'}: ${url}`);
-            const res = await session.fetch(url, options);
+            const res = await result.fetch(url, options);
             // console.info(`${options.method ?? 'GET'}: ${url}`, res.status);
 // res.headers.set('Link', `<rel=${url}.acl>`);
             // res.headers.set('Location', `${url}`);
@@ -63,7 +65,7 @@ async function _getSession(): Promise<ISession> {
         //     idp: POD
         // });
         return {
-            webId: session.info.webId,
+            webId: result.info.webId,
             issuer: config.oidcIssuer
         };
     }catch (e) {

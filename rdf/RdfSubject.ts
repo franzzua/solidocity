@@ -1,5 +1,5 @@
 import {Reference} from "../contracts";
-import {Quad_Subject, Triple} from "n3";
+import {DataFactory, Quad_Subject, Triple} from "n3";
 import {rdf} from "rdf-namespaces";
 import {RdfStore} from "./RdfStore";
 import {RdfScalar} from "./values/rdf-scalar";
@@ -15,8 +15,8 @@ export class RdfSubject {
     constructor(public store: RdfStore,
                 public subject: Quad_Subject,
                 triples: Triple[]) {
-        this.Type = this.triples.find(x => x.predicate.value == rdf.type)?.object?.value;
         this.ArSet = new ArSet<Triple>(triples);
+        this.Type = triples.find(x => x.predicate.value == rdf.type)?.object?.value;
     }
 
     public ArSet: ArSet<Triple>;
@@ -43,16 +43,16 @@ export class RdfSubject {
         this.ArSet.add(...newTriples);
     }
 
-    Set<T extends RdfValueType = RdfValueType>(predicate, type): RdfSet<T> {
-        return new RdfSet<T>(this, predicate, type);
+    Set<T extends RdfValueType = RdfValueType>(predicate: string, type): RdfSet<T> {
+        return new RdfSet<T>(this, DataFactory.namedNode(predicate), type);
     }
 
-    Scalar<T extends RdfValueType = RdfValueType>(predicate, type): RdfScalar<T> {
-        return new RdfScalar<T>(this, predicate, type);
+    Scalar<T extends RdfValueType = RdfValueType>(predicate: string, type): RdfScalar<T> {
+        return new RdfScalar<T>(this, DataFactory.namedNode(predicate), type);
     }
 
-    Link(predicate) {
-        return new RdfLink(this, predicate);
+    Link(predicate: string) {
+        return new RdfLink(this, DataFactory.namedNode(predicate));
     }
 
     public merge(triples: Triple[]): void {
@@ -61,6 +61,10 @@ export class RdfSubject {
 
     public getChanges(): Change<Triple> {
         return this.ArSet.getChanges();
+    }
+
+    public saveChanges(): void {
+        this.ArSet.saveChanges();
     }
 }
 

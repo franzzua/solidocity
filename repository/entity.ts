@@ -77,7 +77,7 @@ export class Entity {
             } else if (info.isArray) {
                 this.Subject.Set(info.predicate, info.type).set(this[key]);
             } else {
-                this.Subject.Set(info.predicate, info.type).set(this[key]);
+                this.Subject.Scalar(info.predicate, info.type).set(this[key]);
             }
         }
         const currentType = Metadata.Entities.get(this.constructor).TypeReference;

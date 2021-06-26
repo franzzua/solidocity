@@ -45,8 +45,8 @@ export class EntitySet<TEntity extends Entity> {
         // console.log('load entity set', entries.length, this._added.length);
     }
 
-    public get(id: Reference): TEntity {
-        return this.items.get(id);
+    public get(uri: Reference): TEntity {
+        return this.items.get(uri);
     }
 }
 
