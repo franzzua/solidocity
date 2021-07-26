@@ -11,10 +11,7 @@ import {authFetch} from "../../impl/auth";
 export class AclDocument extends BaseDocument{
 
     constructor(baseURI: Reference, private ownerURI: Reference) {
-        super(baseURI, {
-            createInNotExists: false,
-            persistance: false
-        });
+        super(baseURI);
     }
 
 
@@ -48,7 +45,7 @@ export class AclDocument extends BaseDocument{
     }
 
     /** @internal **/
-    protected async InitRules(doc: RdfDocument, owner: Reference, rights: Reference[]){
+    protected async InitRules(doc: BaseDocument, owner: Reference, rights: Reference[]){
         const myAuth = this.Rules.Add(`${doc.URI}#owner`);
         myAuth.AccessTo = this.ownerURI;
         myAuth.Agents = [            owner        ]

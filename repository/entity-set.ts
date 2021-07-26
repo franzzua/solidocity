@@ -1,11 +1,10 @@
 import {Entity, EntityConstructor} from "./entity";
-import {BaseDocument} from "./base.document";
-import {Metadata} from "./helpers/metadata";
 import {Reference} from "../contracts";
 import {RdfSubject} from "../rdf/RdfSubject";
+import {RdfDocument} from "../rdf/RdfDocument";
 
 export class EntitySet<TEntity extends Entity> {
-    constructor(protected document: BaseDocument,
+    constructor(protected rdfDoc: RdfDocument,
                 protected itemConstructor: EntityConstructor<TEntity>,
                 protected items: Map<Reference, TEntity> = new Map()) {
     }
@@ -16,8 +15,8 @@ export class EntitySet<TEntity extends Entity> {
 
 
     public Add(uri = undefined) {
-        const subject = this.document.rdfDoc.addSubject(uri);
-        const newItem = new this.itemConstructor(subject, this.document);
+        const subject = this.rdfDoc.addSubject(uri);
+        const newItem = new this.itemConstructor(subject, this.rdfDoc);
         this.items.set(newItem.Id, newItem);
         return newItem;
     }
@@ -25,7 +24,7 @@ export class EntitySet<TEntity extends Entity> {
 
     public Remove(entity: TEntity){
         this.items.delete(entity.Id);
-        entity.Subject.remove();
+        entity.Subject.Remove();
     }
 
     /** @internal */
@@ -38,7 +37,7 @@ export class EntitySet<TEntity extends Entity> {
                     item.Load();
                     return item;
                 }
-                return new this.itemConstructor(x, this.document)
+                return new this.itemConstructor(x, this.rdfDoc)
             })
             .map(x => [x.Id, x] as [Reference, TEntity]);
         this.items = new Map(entries);
@@ -55,12 +54,13 @@ export class FieldEntitySet<TEntity extends Entity> extends EntitySet<TEntity> {
     // private docSet: EntitySet<TEntity>;
 
     /** @internal **/
-    constructor(document: BaseDocument, itemConstructor: EntityConstructor<TEntity>,
+    constructor(document: RdfDocument, itemConstructor: EntityConstructor<TEntity>,
                 private subj: RdfSubject, private predicate: Reference) {
         super(document, itemConstructor);
         // this.docSet = new EntitySet(document, itemConstructor);
     }
 
+    private Link = this.rdfDoc.Link(this.subj, this.predicate);
 
     public get Items(): ReadonlyArray<TEntity> {
         return [
@@ -71,8 +71,8 @@ export class FieldEntitySet<TEntity extends Entity> extends EntitySet<TEntity> {
 
 
     public Add(id = undefined) {
-        const subject = this.subj.Link(this.predicate).add();
-        const result = new this.itemConstructor(subject, this.document);
+        const subject = this.Link.add();
+        const result = new this.itemConstructor(subject, this.rdfDoc);
         this.items.set(result.Id, result);
         // const info = Metadata.Entities.get(this.itemConstructor);
         // this.subj.addValue(info.TypeReference, "ref", result.Id);
@@ -81,7 +81,7 @@ export class FieldEntitySet<TEntity extends Entity> extends EntitySet<TEntity> {
 
     public Remove(entity: TEntity){
         this.items.delete(entity.Id);
-        this.subj.Link(this.predicate).remove(entity.Subject) ;
+        this.Link.remove(entity.Subject) ;
     }
 
     /** @internal */

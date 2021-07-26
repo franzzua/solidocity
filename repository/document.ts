@@ -3,6 +3,7 @@ import {Constructor, Metadata} from "./helpers/metadata";
 import {Entity, EntityConstructor} from "./entity";
 import {BaseDocument} from "./base.document";
 import {Reference} from "../contracts";
+import {ulid} from "ulid";
 
 export class Document extends BaseDocument {
 
@@ -48,8 +49,8 @@ export class ItemsDocument<TEntity extends Entity> extends Document {
     public Items: TEntity[];
 
     public async Create(item: Omit<TEntity, keyof Entity>): Promise<TEntity> {
-        const subject = this.rdfDoc.addSubject();
-        const newItem = new this.type(subject, this) as TEntity;
+        const subject = this.rdfDoc.addSubject(`${this.URI}#${ulid()}`);
+        const newItem = new this.type(subject, this.rdfDoc) as TEntity;
         Object.assign(newItem, item);
         newItem.Save();
         await this.rdfDoc.Save();
